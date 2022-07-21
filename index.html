@@ -1,0 +1,34 @@
+<html>
+ <head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="index.css">
+  <title>麻雀判定ツール</title>
+ </head>
+ <body>
+  <h1 id="state_text">手配を入力してください(残り14牌)</h1>
+  <div id="tehai"></div>
+  <div id="tehai_naki">
+    <div class="naki_pais" id="naki_1"></div>
+    <div class="naki_pais" id="naki_2"></div>
+    <div class="naki_pais" id="naki_3"></div>
+    <div class="naki_pais" id="naki_4"></div>
+  </div>
+  <div id="select"></div>
+  <div id="btnlist_naki">
+   <button type="button" class="btn_naki" id="btn_pong" onclick="btn_pong_click()"><img id="btn_pong_img" src="images/btn/btn_pong.png"></button>
+   <button type="button" class="btn_naki" id="btn_chi" onclick="btn_chi_click()"><img id="btn_chi_img" src="images/btn/btn_chi.png"></button>
+   <button type="button" class="btn_naki" id="btn_ankan" onclick="btn_ankan_click()"><img id="btn_ankan_img" src="images/btn/btn_ankan.png"></button>
+   <button type="button" class="btn_naki" id="btn_minkan" onclick="btn_minkan_click()"><img id="btn_minkan_img" src="images/btn/btn_minkan.png"></button>
+  </div>
+  <div id="modal_noten" class="modal">
+   <div class="modal_content">
+    <div class="modal_header">
+      <h1>聴牌していません</h1>
+      <span id="modal_noten_close" class="modal_close">×</span>
+    </div>
+    <div id="modal_noten_body" class="modal_body"></div>
+   </div>
+  </div>
+ </body>
+ <script src="script.js"></script>
+</html>
