@@ -79,6 +79,7 @@ let btn_minkan_img = document.getElementById('btn_minkan_img');
 //ダイヤログ用のオブジェクト
 let modal_noten = document.getElementById('modal_noten');
 let modal_noten_body = document.getElementById('modal_noten_body');
+let modal_agari = document.getElementById('modal_agari');
 
 //手配のオブジェクトの取得
 function get_tehai_obj(num){
@@ -1092,7 +1093,7 @@ for(let i = 0; i < table_pais.length; i++){
         }
         //和了の場合
         else if(mode_current == Mode.agari && agarihai_list.includes(pai_num)){
-            alert("test");
+            modal_agari.style.display = "block";
         }
 
         //手配の空きが残り3枚以下になったら鳴きボタンを非表示にする
@@ -1205,11 +1206,20 @@ let modal_noten_close = document.getElementById('modal_noten_close');
 modal_noten_close.addEventListener("click", (event) =>{
     modalNotenClose();
 });
+//イベント登録（アガリ用ダイヤログの閉じるボタン）
+let modal_agari_close = document.getElementById('modal_agari_close');
+modal_agari_close.addEventListener("click", (event) =>{
+    modalAgariClose();
+});
 //モーダルコンテンツ以外がクリックされた時のイベントをそれぞれのダイヤログに登録
 addEventListener("click", (event) =>{
     //ノーテン時
     if(event.target == modal_noten){
         modalNotenClose();
+    }
+    //アガリ時
+    if(event.target == modal_agari){
+        modalAgariClose();
     }
 });
 //ノーテン用ダイヤログが閉じたときの処理
@@ -1229,6 +1239,16 @@ function modalNotenClose(){
     else if(mode_old == Mode.pong || mode_old == Mode.chi || mode_old == Mode.ankan || mode_old == Mode.minkan){
         tehai_nakis[naki_pais_list.length - 1].click();
     }
+}
+//アガリ用ダイヤログが閉じたときの処理
+function modalAgariClose(){
+    modal_agari.style.display = "none";
+}
+//ツモボタンをクリックした時
+function btn_tsumo_click(){
+}
+//ロンボタンをクリックした時
+function btn_ron_click(){
 }
 
 //鳴きボタン用関数

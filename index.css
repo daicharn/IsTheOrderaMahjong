@@ -49,6 +49,9 @@ body{
 #modal_noten{
     display: none;
 }
+#modal_agari{
+    display: none;
+}
 .modal{
     position: fixed;
     z-index: 1;
@@ -86,4 +89,13 @@ body{
 .modal_body{
     padding: 10px 20px;
     color: black;
+}
+#btnlist_agari{
+    text-align: center;
+}
+.btn_agari{
+    font-size: 30px;
+    padding: 0 30px;
+    cursor:pointer;
+    margin: 0 10px;
 }
