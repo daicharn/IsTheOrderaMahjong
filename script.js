@@ -1113,13 +1113,14 @@ for(let i = 0; i < tehai_pais.length; i++){
     tehai_pais[i].addEventListener("click",(event) => {
         //現在は通常時のみ作動
         if(mode_current == Mode.normal || mode_current == Mode.tenpai || mode_current == Mode.agari){
-            let tehai_value = get_tehai_value(i + 1);
+            let pai_num = Number(get_tehai_value(i + 1));
             //すでに牌があれば消去する
-            if(tehai_value != BACK){
+            if(pai_num != BACK){
                 //消去前に4枚であればテーブルの牌を表に戻す
-                if(count_tehai_pai(tehai_value) == PAI_MAX){
-                    visible_table_pai(tehai_value);
-                    max_pais_list.pop(tehai_value);
+                if(count_tehai_pai(pai_num) == PAI_MAX){
+                    visible_table_pai(pai_num);
+                    let max_pai_index = max_pais_list.indexOf(pai_num);
+                    max_pais_list.splice(max_pai_index, 1);
                 }
                 set_tehai_value(i + 1, BACK);
                 set_tehai_img(i + 1, generate_pai_src(BACK));
@@ -1173,13 +1174,16 @@ for(let i = 0; i < tehai_nakis.length; i++){
             }
             //テーブルの牌を表に戻す
             visible_table_pai(pai_num);
-            max_pais_list.pop(pai_num);
+            let max_pai_index_0 = max_pais_list.indexOf(pai_num);
+            max_pais_list.splice(max_pai_index_1, 1);
             //チーの時は右隣2つの牌も表に戻す
             if(naki_type_list[pai_index] == Naki_Type.chi){
                 visible_table_pai(pai_num + 1);
                 visible_table_pai(pai_num + 2);
-                max_pais_list.pop(pai_num + 1);
-                max_pais_list.pop(pai_num + 2);
+                let max_pai_index_1 = max_pais_list.indexOf(pai_num + 1);
+                let max_pai_index_2 = max_pais_list.indexOf(pai_num + 2);
+                max_pais_list.splice(max_pai_index_1, 1);
+                max_pais_list.splice(max_pai_index_2, 1);
             }
 
             //鳴きリストから削除
