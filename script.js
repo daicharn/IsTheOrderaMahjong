@@ -81,6 +81,12 @@ let modal_noten = document.getElementById('modal_noten');
 let modal_noten_body = document.getElementById('modal_noten_body');
 let modal_agari = document.getElementById('modal_agari');
 
+//状態テロップの文字を変更
+function stateText_change(str){
+    let stateText = document.getElementById('state_text');
+    stateText.innerHTML = str;
+}
+
 //手配のオブジェクトの取得
 function get_tehai_obj(num){
     let tehai_div = 'tehai_' + (Math.floor(num)).toString().padStart(2, '0');
@@ -817,6 +823,8 @@ function tenpai_shori(){
         }
         //モードを聴牌にする
         mode_current = Mode.tenpai;
+        //テロップを聴牌に変更する
+        stateText_change("聴牌：最後の牌を入力してください");
     }
     else{
         //ノーテンを知らせるダイヤログを表示させる
@@ -824,6 +832,8 @@ function tenpai_shori(){
         modal_text.innerText = "現在の手牌は" + shanten + "向聴です。聴牌の状態を入力してください。";
         modal_noten_body.appendChild(modal_text);
         modal_noten.style.display = "block";
+        //テロップを残り1枚に変更する
+        stateText_change("手配を入力してください(残り1牌)");
     }
 }
 
@@ -1090,10 +1100,17 @@ for(let i = 0; i < table_pais.length; i++){
             }
             //モードを和了に変更
             mode_current = Mode.agari;
+            //テロップを和了に変更
+            stateText_change("和了：アガリ牌を選択してください");
         }
         //和了の場合
         else if(mode_current == Mode.agari && agarihai_list.includes(pai_num)){
             modal_agari.style.display = "block";
+        }
+
+        //手牌の空きが2枚以上であれば状態テロップの枚数を減らす（通常モード時のみ）
+        if(count_tehai_num() <= TEHAI_NUMBER - 2 && mode_current == Mode.normal){
+            stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         }
 
         //手配の空きが残り3枚以下になったら鳴きボタンを非表示にする
@@ -1127,6 +1144,11 @@ for(let i = 0; i < tehai_pais.length; i++){
                 tehai_sort();
                 tehai_current--;
             }
+        }
+
+        //手牌の空きが2枚以上であれば状態テロップの枚数を増やす
+        if(count_tehai_num() <= TEHAI_NUMBER - 2){
+            stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         }
 
         //手配の空きが残り4枚以上になったら鳴きボタンを表示する
@@ -1175,7 +1197,7 @@ for(let i = 0; i < tehai_nakis.length; i++){
             //テーブルの牌を表に戻す
             visible_table_pai(pai_num);
             let max_pai_index_0 = max_pais_list.indexOf(pai_num);
-            max_pais_list.splice(max_pai_index_1, 1);
+            max_pais_list.splice(max_pai_index_0, 1);
             //チーの時は右隣2つの牌も表に戻す
             if(naki_type_list[pai_index] == Naki_Type.chi){
                 visible_table_pai(pai_num + 1);
@@ -1189,7 +1211,10 @@ for(let i = 0; i < tehai_nakis.length; i++){
             //鳴きリストから削除
             naki_pais_list.splice(pai_index, 1);
             naki_type_list.splice(pai_index, 1);
-    
+
+            //状態テロップの枚数を増やす
+            stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
+
             //手配の空きが残り4枚以上になったら鳴きボタンを表示する
             if(count_tehai_num() < TEHAI_NUMBER - 3){
                 visible_naki_btn();
@@ -1271,6 +1296,8 @@ function btn_pong_click(){
         btn_chi_img.style.visibility = "hidden";
         btn_ankan_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
+        //テロップをポンに変更
+        stateText_change("ポン：ポンする牌を入力してください");
         //モードをポンへ
         mode_current = Mode.pong;
     }
@@ -1286,6 +1313,8 @@ function btn_pong_click(){
         btn_chi_img.style.visibility = "visible";
         btn_ankan_img.style.visibility = "visible";
         btn_minkan_img.style.visibility = "visible";
+        //テロップを通常に変更
+        stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
         mode_current = Mode.normal;
     }
@@ -1304,6 +1333,8 @@ function btn_chi_click(){
         btn_pong_img.style.visibility = "hidden";
         btn_ankan_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
+        //テロップをチーに変更
+        stateText_change("チー：チーする牌を入力してください");
         //モードをチーへ
         mode_current = Mode.chi;
     }
@@ -1319,6 +1350,8 @@ function btn_chi_click(){
         btn_pong_img.style.visibility = "visible";
         btn_ankan_img.style.visibility = "visible";
         btn_minkan_img.style.visibility = "visible";
+        //テロップを通常に変更
+        stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
         mode_current = Mode.normal;
     }
@@ -1337,6 +1370,8 @@ function btn_ankan_click(){
         btn_pong_img.style.visibility = "hidden";
         btn_chi_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
+        //テロップを暗槓に変更
+        stateText_change("暗槓：暗槓する牌を入力してください");
         //モードを暗槓へ
         mode_current = Mode.ankan;
     }
@@ -1352,6 +1387,8 @@ function btn_ankan_click(){
         btn_pong_img.style.visibility = "visible";
         btn_chi_img.style.visibility = "visible";
         btn_minkan_img.style.visibility = "visible";
+        //テロップを通常に変更
+        stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
         mode_current = Mode.normal;
     }
@@ -1370,6 +1407,8 @@ function btn_minkan_click(){
         btn_pong_img.style.visibility = "hidden";
         btn_chi_img.style.visibility = "hidden";
         btn_ankan_img.style.visibility = "hidden";
+        //テロップを明槓に変更
+        stateText_change("明槓：明槓する牌を入力してください");
         //モードを明槓へ
         mode_current = Mode.minkan;
     }
@@ -1385,6 +1424,8 @@ function btn_minkan_click(){
         btn_pong_img.style.visibility = "visible";
         btn_chi_img.style.visibility = "visible";
         btn_ankan_img.style.visibility = "visible";
+        //テロップを通常に変更
+        stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
         mode_current = Mode.normal;
     }
