@@ -71,10 +71,6 @@ let btn_pong = document.getElementById('btn_pong');
 let btn_chi = document.getElementById('btn_chi');
 let btn_ankan = document.getElementById('btn_ankan');
 let btn_minkan = document.getElementById('btn_minkan');
-let btn_pong_img = document.getElementById('btn_pong_img');
-let btn_chi_img = document.getElementById('btn_chi_img');
-let btn_ankan_img = document.getElementById('btn_ankan_img');
-let btn_minkan_img = document.getElementById('btn_minkan_img');
 
 //ダイヤログ用のオブジェクト
 let modal_noten = document.getElementById('modal_noten');
@@ -1289,13 +1285,13 @@ function btn_pong_click(){
         hidden_table_naki(Naki_Type.pong);
         
         //ポン以外を隠す
-        btn_pong_img.setAttribute('src', "images/btn/btn_kaijyo.png");
+        btn_pong.innerText = "解除";
         btn_chi.style.cursor = "default";
         btn_ankan.style.cursor = "default";
         btn_minkan.style.cursor = "default";
-        btn_chi_img.style.visibility = "hidden";
-        btn_ankan_img.style.visibility = "hidden";
-        btn_minkan_img.style.visibility = "hidden";
+        btn_chi.style.visibility = "hidden";
+        btn_ankan.style.visibility = "hidden";
+        btn_minkan.style.visibility = "hidden";
         //テロップをポンに変更
         stateText_change("ポン：ポンする牌を選択してください");
         //モードをポンへ
@@ -1306,13 +1302,13 @@ function btn_pong_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_pong_img.setAttribute('src', "images/btn/btn_pong.png");
+        btn_pong.innerText = "ポン";
         btn_chi.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
-        btn_chi_img.style.visibility = "visible";
-        btn_ankan_img.style.visibility = "visible";
-        btn_minkan_img.style.visibility = "visible";
+        btn_chi.style.visibility = "visible";
+        btn_ankan.style.visibility = "visible";
+        btn_minkan.style.visibility = "visible";
         //テロップを通常に変更
         stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
@@ -1326,13 +1322,13 @@ function btn_chi_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.chi);
         //チー以外を隠す
-        btn_chi_img.setAttribute('src', "images/btn/btn_kaijyo.png");
+        btn_chi.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_ankan.style.cursor = "default";
         btn_minkan.style.cursor = "default";
-        btn_pong_img.style.visibility = "hidden";
-        btn_ankan_img.style.visibility = "hidden";
-        btn_minkan_img.style.visibility = "hidden";
+        btn_pong.style.visibility = "hidden";
+        btn_ankan.style.visibility = "hidden";
+        btn_minkan.style.visibility = "hidden";
         //テロップをチーに変更
         stateText_change("チー：最小の牌を選択してください");
         //モードをチーへ
@@ -1343,13 +1339,13 @@ function btn_chi_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_chi_img.setAttribute('src', "images/btn/btn_chi.png");
+        btn_chi.innerText = "チー";
         btn_pong.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
-        btn_pong_img.style.visibility = "visible";
-        btn_ankan_img.style.visibility = "visible";
-        btn_minkan_img.style.visibility = "visible";
+        btn_pong.style.visibility = "visible";
+        btn_ankan.style.visibility = "visible";
+        btn_minkan.style.visibility = "visible";
         //テロップを通常に変更
         stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
@@ -1363,13 +1359,13 @@ function btn_ankan_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.ankan);
         //暗槓以外を隠す
-        btn_ankan_img.setAttribute('src', "images/btn/btn_kaijyo.png");
+        btn_ankan.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_chi.style.cursor = "default";
         btn_minkan.style.cursor = "default";
-        btn_pong_img.style.visibility = "hidden";
-        btn_chi_img.style.visibility = "hidden";
-        btn_minkan_img.style.visibility = "hidden";
+        btn_pong.style.visibility = "hidden";
+        btn_chi.style.visibility = "hidden";
+        btn_minkan.style.visibility = "hidden";
         //テロップを暗槓に変更
         stateText_change("暗槓：暗槓する牌を選択してください");
         //モードを暗槓へ
@@ -1380,13 +1376,13 @@ function btn_ankan_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_ankan_img.setAttribute('src', "images/btn/btn_ankan.png");
+        btn_ankan.innerText = "暗槓";
         btn_pong.style.cursor = "pointer";
         btn_chi.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
-        btn_pong_img.style.visibility = "visible";
-        btn_chi_img.style.visibility = "visible";
-        btn_minkan_img.style.visibility = "visible";
+        btn_pong.style.visibility = "visible";
+        btn_chi.style.visibility = "visible";
+        btn_minkan.style.visibility = "visible";
         //テロップを通常に変更
         stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
@@ -1400,13 +1396,13 @@ function btn_minkan_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.minkan);
         //明槓以外を隠す
-        btn_minkan_img.setAttribute('src', "images/btn/btn_kaijyo.png");
+        btn_minkan.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_chi.style.cursor = "default";
         btn_ankan.style.cursor = "default";
-        btn_pong_img.style.visibility = "hidden";
-        btn_chi_img.style.visibility = "hidden";
-        btn_ankan_img.style.visibility = "hidden";
+        btn_pong.style.visibility = "hidden";
+        btn_chi.style.visibility = "hidden";
+        btn_ankan.style.visibility = "hidden";
         //テロップを明槓に変更
         stateText_change("明槓：明槓する牌を選択してください");
         //モードを明槓へ
@@ -1417,13 +1413,13 @@ function btn_minkan_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();        
         //ボタンを元に戻す
-        btn_minkan_img.setAttribute('src', "images/btn/btn_minkan.png");
+        btn_minkan.innerText = "明槓";
         btn_pong.style.cursor = "pointer";
         btn_chi.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
-        btn_pong_img.style.visibility = "visible";
-        btn_chi_img.style.visibility = "visible";
-        btn_ankan_img.style.visibility = "visible";
+        btn_pong.style.visibility = "visible";
+        btn_chi.style.visibility = "visible";
+        btn_ankan.style.visibility = "visible";
         //テロップを通常に変更
         stateText_change("手配を入力してください(残り" + (TEHAI_NUMBER - count_tehai_num()).toString() + "牌)");
         //モードを通常へ
