@@ -824,7 +824,7 @@ function tenpai_shori(){
         //モードを聴牌にする
         mode_current = Mode.tenpai;
         //テロップを聴牌に変更する
-        stateText_change("聴牌：最後の牌を入力してください");
+        stateText_change("聴牌：最後の牌を選択してください");
     }
     else{
         //ノーテンを知らせるダイヤログを表示させる
@@ -1297,7 +1297,7 @@ function btn_pong_click(){
         btn_ankan_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
         //テロップをポンに変更
-        stateText_change("ポン：ポンする牌を入力してください");
+        stateText_change("ポン：ポンする牌を選択してください");
         //モードをポンへ
         mode_current = Mode.pong;
     }
@@ -1334,7 +1334,7 @@ function btn_chi_click(){
         btn_ankan_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
         //テロップをチーに変更
-        stateText_change("チー：チーする牌を入力してください");
+        stateText_change("チー：最小の牌を選択してください");
         //モードをチーへ
         mode_current = Mode.chi;
     }
@@ -1371,7 +1371,7 @@ function btn_ankan_click(){
         btn_chi_img.style.visibility = "hidden";
         btn_minkan_img.style.visibility = "hidden";
         //テロップを暗槓に変更
-        stateText_change("暗槓：暗槓する牌を入力してください");
+        stateText_change("暗槓：暗槓する牌を選択してください");
         //モードを暗槓へ
         mode_current = Mode.ankan;
     }
@@ -1408,7 +1408,7 @@ function btn_minkan_click(){
         btn_chi_img.style.visibility = "hidden";
         btn_ankan_img.style.visibility = "hidden";
         //テロップを明槓に変更
-        stateText_change("明槓：明槓する牌を入力してください");
+        stateText_change("明槓：明槓する牌を選択してください");
         //モードを明槓へ
         mode_current = Mode.minkan;
     }
