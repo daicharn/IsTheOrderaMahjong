@@ -35,6 +35,14 @@ const Naki_Type = {
     minkan : 3
 }
 
+//風の種類
+const Kaze_Type = {
+    ton : 0,
+    nan : 1,
+    sha : 2,
+    pei : 3
+}
+
 //現在の手配の数
 let tehai_current = 0;
 
@@ -66,6 +74,14 @@ let agarihai_list = [];
 //前回追加された牌を記憶
 let before_addPai = 0;
 
+//場風
+let bakaze = Kaze_Type.ton;
+//自風
+let jikaze = Kaze_Type.ton;
+
+//立直の有無
+let reach_flg = false;
+
 //鳴きボタンのオブジェクト
 let btn_pong = document.getElementById('btn_pong');
 let btn_chi = document.getElementById('btn_chi');
@@ -76,6 +92,8 @@ let btn_minkan = document.getElementById('btn_minkan');
 let modal_noten = document.getElementById('modal_noten');
 let modal_noten_body = document.getElementById('modal_noten_body');
 let modal_agari = document.getElementById('modal_agari');
+let modal_bakaze = document.getElementById('modal_bakaze');
+let modal_jikaze = document.getElementById('modal_jikaze');
 
 //状態テロップの文字を変更
 function stateText_change(str){
@@ -882,6 +900,134 @@ function tehai_set(num){
     }
 }
 
+//面前かどうか判定する
+function isMenzen(){
+    for(let i = 0; i < naki_type_list.length; i++){
+        //暗槓以外の鳴きがあれば面前でないとみなす
+        if(naki_type_list[i] != Naki_Type.ankan){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//場風の変更
+function changeBakaze(bakaze_new){
+    let btn_bakaze = document.getElementById('btn_bakaze');
+    let btn_ton = document.getElementById('btn_bakaze_ton');
+    let btn_nan = document.getElementById('btn_bakaze_nan');
+    let btn_sha = document.getElementById('btn_bakaze_sha');
+    let btn_pei = document.getElementById('btn_bakaze_pei');
+    //現在の場風のボタンを表示させる
+    switch (bakaze){
+        //東
+        case Kaze_Type.ton:
+            btn_ton.style.display = "inline";
+            break;
+        //南
+        case Kaze_Type.nan:
+            btn_nan.style.display = "inline";
+            break;
+        //西
+        case Kaze_Type.sha:
+            btn_sha.style.display = "inline";
+            break;
+        //北
+        case Kaze_Type.pei:
+            btn_pei.style.display = "inline";
+            break;
+    }
+    //場風の変更とそのボタンを非表示
+    switch (bakaze_new){
+        //東
+        case Kaze_Type.ton:
+            bakaze = bakaze_new;
+            btn_bakaze.innerText = "場風(東)"
+            btn_ton.style.display = "none";
+            break;
+        //南
+        case Kaze_Type.nan:
+            bakaze = bakaze_new;
+            btn_bakaze.innerText = "場風(南)"
+            btn_nan.style.display = "none";
+            break;
+        //西
+        case Kaze_Type.sha:
+            bakaze = bakaze_new;
+            btn_bakaze.innerText = "場風(西)"
+            btn_sha.style.display = "none";
+            break;
+        //北
+        case Kaze_Type.pei:
+            bakaze = bakaze_new;
+            btn_bakaze.innerText = "場風(北)"
+            btn_pei.style.display = "none";
+            break;
+    }
+
+    //自風のダイヤログを閉じる
+    modalBakazeClose();
+}
+
+//自風の変更
+function changeJikaze(jikaze_new){
+    let btn_jikaze = document.getElementById('btn_jikaze');
+    let btn_ton = document.getElementById('btn_jikaze_ton');
+    let btn_nan = document.getElementById('btn_jikaze_nan');
+    let btn_sha = document.getElementById('btn_jikaze_sha');
+    let btn_pei = document.getElementById('btn_jikaze_pei');
+    //現在の自風のボタンを表示させる
+    switch (jikaze){
+        //東
+        case Kaze_Type.ton:
+            btn_ton.style.display = "inline";
+            break;
+        //南
+        case Kaze_Type.nan:
+            btn_nan.style.display = "inline";
+            break;
+        //西
+        case Kaze_Type.sha:
+            btn_sha.style.display = "inline";
+            break;
+        //北
+        case Kaze_Type.pei:
+            btn_pei.style.display = "inline";
+            break;
+    }
+    //自風の変更とそのボタンを非表示
+    switch (jikaze_new){
+        //東
+        case Kaze_Type.ton:
+            jikaze = jikaze_new;
+            btn_jikaze.innerText = "自風(東)"
+            btn_ton.style.display = "none";
+            break;
+        //南
+        case Kaze_Type.nan:
+            jikaze = jikaze_new;
+            btn_jikaze.innerText = "自風(南)"
+            btn_nan.style.display = "none";
+            break;
+        //西
+        case Kaze_Type.sha:
+            jikaze = jikaze_new;
+            btn_jikaze.innerText = "自風(西)"
+            btn_sha.style.display = "none";
+            break;
+        //北
+        case Kaze_Type.pei:
+            jikaze = jikaze_new;
+            btn_jikaze.innerText = "自風(北)"
+            btn_pei.style.display = "none";
+            break;
+    }
+
+    //自風のダイヤログを閉じる
+    modalJikazeClose();
+}
+
 //初期手配（全て裏返しの状態）の生成
 for(i = 0; i < TEHAI_NUMBER; i++){
     let div_element = document.createElement('div');
@@ -991,6 +1137,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_pong_click();
+            btn_reach_click();
         }
         //チー（チーできるかどうかを調べてから行う）
         else if(mode_current == Mode.chi && isPossible_chi(pai_num) && count_tehai_pai(pai_num) < PAI_MAX){
@@ -1026,6 +1173,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_chi_click();
+            btn_reach_click();
         }
         //暗槓（手配に1枚以上ある場合は行わない）
         else if(mode_current == Mode.ankan && count_tehai_pai(pai_num) <= 0){
@@ -1052,6 +1200,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_ankan_click();
+            //暗槓の時は立直の解除の必要なし
         }
         //明槓（手配に1枚以上ある場合は行わない）
         else if(mode_current == Mode.minkan && count_tehai_pai(pai_num) <= 0){
@@ -1081,6 +1230,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_minkan_click();
+            btn_reach_click();
         }
         //聴牌の場合
         else if(mode_current == Mode.tenpai && count_tehai_pai(pai_num) < PAI_MAX && machihai_list.includes(pai_num)){
@@ -1236,6 +1386,16 @@ let modal_agari_close = document.getElementById('modal_agari_close');
 modal_agari_close.addEventListener("click", (event) =>{
     modalAgariClose();
 });
+//イベント登録（場風用ダイヤログの閉じるボタン）
+let modal_bakaze_close = document.getElementById('modal_bakaze_close');
+modal_bakaze_close.addEventListener("click", (event) =>{
+    modalBakazeClose();
+});
+//イベント登録（自風用ダイヤログの閉じるボタン）
+let modal_jikaze_close = document.getElementById('modal_jikaze_close');
+modal_jikaze_close.addEventListener("click", (event) =>{
+    modalJikazeClose();
+});
 //モーダルコンテンツ以外がクリックされた時のイベントをそれぞれのダイヤログに登録
 addEventListener("click", (event) =>{
     //ノーテン時
@@ -1245,6 +1405,14 @@ addEventListener("click", (event) =>{
     //アガリ時
     if(event.target == modal_agari){
         modalAgariClose();
+    }
+    //場風変更時
+    if(event.target == modal_bakaze){
+        modalBakazeClose();
+    }
+    //自風変更時
+    if(event.target == modal_jikaze){
+        modalJikazeClose();
     }
 });
 //ノーテン用ダイヤログが閉じたときの処理
@@ -1274,6 +1442,126 @@ function btn_tsumo_click(){
 }
 //ロンボタンをクリックした時
 function btn_ron_click(){
+}
+//場風用ダイヤログが閉じたときの処理
+function modalBakazeClose(){
+    modal_bakaze.style.display = "none";
+}
+//自風用ダイヤログが閉じたときの処理
+function modalJikazeClose(){
+    modal_jikaze.style.display = "none";
+}
+
+//各種ボタン用関数
+//場風
+function btn_bakaze_click(){
+    //場風ダイヤログを表示する
+    modal_bakaze.style.display = "block";
+}
+function btn_bakaze_ton_click(){
+    changeBakaze(Kaze_Type.ton);
+}
+function btn_bakaze_nan_click(){
+    changeBakaze(Kaze_Type.nan);
+}
+function btn_bakaze_sha_click(){
+    changeBakaze(Kaze_Type.sha);
+}
+function btn_bakaze_pei_click(){
+    changeBakaze(Kaze_Type.pei);
+}
+//自風
+function btn_jikaze_click(){
+    //自風ダイヤログを表示する
+    modal_jikaze.style.display = "block";
+}
+function btn_jikaze_ton_click(){
+    changeJikaze(Kaze_Type.ton);
+}
+function btn_jikaze_nan_click(){
+    changeJikaze(Kaze_Type.nan);
+}
+function btn_jikaze_sha_click(){
+    changeJikaze(Kaze_Type.sha);
+}
+function btn_jikaze_pei_click(){
+    changeJikaze(Kaze_Type.pei);
+}
+//立直
+function btn_reach_click(){
+    let btn_reach = document.getElementById('btn_reach');
+    //立直ON状態で押下
+    if(reach_flg){
+        btn_reach.style.color = "black";
+        reach_flg = false;
+    }
+    //立直OFFかつ面前の状態で押下
+    else if(isMenzen()){
+        btn_reach.style.color = "red";
+        reach_flg = true;
+    }
+}
+//消去
+function btn_delete_click(){
+    //鳴きモード時はボタンも戻す
+    //ポン
+    if(mode_current == Mode.pong){
+        btn_pong_click();
+    }
+    //チー
+    if(mode_current == Mode.chi){
+        btn_chi_click();
+    }
+    //暗槓
+    if(mode_current == Mode.ankan){
+        btn_ankan_click();
+    }
+    //明槓
+    if(mode_current == Mode.minkan){
+        btn_minkan_click();
+    }
+
+    /*各種変数のリセット*/
+    //現在の手配の数
+    tehai_current = 0;
+    //現在のモード
+    mode_current = Mode.normal;
+    //鳴いた牌の種類配列
+    naki_pais_list = [];
+    //鳴きの種類の配列
+    naki_type_list = [];
+    //テーブル上の裏返しにした牌のリスト
+    hidden_pais_list = [];
+    //4枚以上使われている牌のリスト
+    max_pais_list = [];
+    //聴牌時の待ち牌リスト
+    machihai_list = [];
+    //和了時のアガリ牌リスト
+    agarihai_list = [];
+
+    //テロップのリセット
+    stateText_change("手配を入力してください(残り14牌)");
+
+    //テーブルのリセット
+    visible_table_pai_all();
+
+    //鳴きボタンを表示
+    visible_naki_btn();
+
+    //手牌のリセット
+    for(let i = 0; i < TEHAI_NUMBER; i++){
+        //手牌の画像と値をリセット
+        set_tehai_img(i + 1, generate_pai_src(BACK));
+        set_tehai_value(i + 1, BACK);
+        //非表示にした牌を表示
+        get_tehai_obj(i + 1).style.visibility = "visible";
+    }
+    //鳴き牌のリセット
+    for(let i = 0; i < tehai_nakis.length; i++){
+        while(tehai_nakis[i].lastChild){
+            tehai_nakis[i].removeChild(tehai_nakis[i].lastChild);
+        }
+    }
 }
 
 //鳴きボタン用関数

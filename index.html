@@ -13,12 +13,18 @@
     <div class="naki_pais" id="naki_3"></div>
     <div class="naki_pais" id="naki_4"></div>
   </div>
+  <div class="btnlist" id="btnlist_situation">
+    <button type="button" class="btn_part" id="btn_bakaze" onclick="btn_bakaze_click()">場風(東)</button>
+    <button type="button" class="btn_part" id="btn_jikaze" onclick="btn_jikaze_click()">自風(東)</button>
+    <button type="button" class="btn_part" id="btn_reach" onclick="btn_reach_click()">立直</button>
+    <button type="button" class="btn_part" id="btn_delete" onclick="btn_delete_click()">全消去</button>
+  </div>
   <div id="select"></div>
-  <div id="btnlist_naki">
-   <button type="button" class="btn_naki" id="btn_pong" onclick="btn_pong_click()">ポン</button>
-   <button type="button" class="btn_naki" id="btn_chi" onclick="btn_chi_click()">チー</button>
-   <button type="button" class="btn_naki" id="btn_ankan" onclick="btn_ankan_click()">暗槓</button>
-   <button type="button" class="btn_naki" id="btn_minkan" onclick="btn_minkan_click()">明槓</button>
+  <div class="btnlist" id="btnlist_naki">
+   <button type="button" class="btn_part" id="btn_pong" onclick="btn_pong_click()">ポン</button>
+   <button type="button" class="btn_part" id="btn_chi" onclick="btn_chi_click()">チー</button>
+   <button type="button" class="btn_part" id="btn_ankan" onclick="btn_ankan_click()">暗槓</button>
+   <button type="button" class="btn_part" id="btn_minkan" onclick="btn_minkan_click()">明槓</button>
   </div>
   <div id="modal_noten" class="modal">
    <div class="modal_content">
@@ -37,13 +43,47 @@
     </div>
     <div id="modal_noten_body" class="modal_body">
      <p>アガリ方を選択してください（ツモかロン）</p>
-     <div id="btnlist_agari">
-      <button type="button" class="btn_agari" id="btn_tsumo" onclick="btn_tsumo_click()">ツモ</button>
-      <button type="button" class="btn_agari" id="btn_ron" onclick="btn_ron_click()">ロン</button>
+     <div class="btnlist_modal">
+      <button type="button" class="btn_modal" id="btn_tsumo" onclick="btn_tsumo_click()">ツモ</button>
+      <button type="button" class="btn_modal" id="btn_ron" onclick="btn_ron_click()">ロン</button>
      </div>
     </div>
    </div>
   </div>
+  <div id="modal_bakaze" class="modal">
+   <div class="modal_content">
+     <div class="modal_header">
+      <h1>場風の変更</h1>
+      <span id="modal_bakaze_close" class="modal_close">×</span>
+     </div>
+     <div id="modal_bakaze_body" class="modal_body">
+      <p>変更後の場風を選択してください</p>
+      <div class="btnlist_modal">
+       <button type="button" class="btn_modal" id="btn_bakaze_ton" onclick="btn_bakaze_ton_click()">東</button>
+       <button type="button" class="btn_modal" id="btn_bakaze_nan" onclick="btn_bakaze_nan_click()">南</button>
+       <button type="button" class="btn_modal" id="btn_bakaze_sha" onclick="btn_bakaze_sha_click()">西</button>
+       <button type="button" class="btn_modal" id="btn_bakaze_pei" onclick="btn_bakaze_pei_click()">北</button>
+      </div>
+     </div>
+    </div>
+  </div>
+  <div id="modal_jikaze" class="modal">
+    <div class="modal_content">
+      <div class="modal_header">
+       <h1>自風の変更</h1>
+       <span id="modal_jikaze_close" class="modal_close">×</span>
+      </div>
+      <div id="modal_jikaze_body" class="modal_body">
+       <p>変更後の自風を選択してください</p>
+       <div class="btnlist_modal">
+        <button type="button" class="btn_modal" id="btn_jikaze_ton" onclick="btn_jikaze_ton_click()">東</button>
+        <button type="button" class="btn_modal" id="btn_jikaze_nan" onclick="btn_jikaze_nan_click()">南</button>
+        <button type="button" class="btn_modal" id="btn_jikaze_sha" onclick="btn_jikaze_sha_click()">西</button>
+        <button type="button" class="btn_modal" id="btn_jikaze_pei" onclick="btn_jikaze_pei_click()">北</button>
+       </div>
+      </div>
+     </div>
+   </div>
  </body>
  <script src="script.js"></script>
 </html>
