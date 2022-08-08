@@ -43,6 +43,12 @@ const Kaze_Type = {
     pei : 3
 }
 
+//アガリ方の種類
+const Agari_Kata = {
+    tsumo : 0,
+    ron : 1
+}
+
 //現在の手配の数
 let tehai_current = 0;
 
@@ -73,6 +79,9 @@ let agarihai_list = [];
 
 //前回追加された牌を記憶
 let before_addPai = 0;
+
+//アガリ牌を記憶
+let agari_hai = 0;
 
 //場風
 let bakaze = Kaze_Type.ton;
@@ -473,7 +482,16 @@ function generateKokushi13Tehai(){
     return haisCount;
 }
 
-//配列のコピーを生成する
+//通常の配列のコピーを生成する
+function copyArray(array){
+    let new_array = new Array(array.length);
+    for(let i = 0; i < array.length; i++){
+        new_array[i] = array[i].slice();
+    }
+    return new_array;
+}
+
+//手配用配列のコピーを生成する
 function copyCountArray(array){
     let new_array = new Array(4);
     for(let i = 0; i < 4; i++){
@@ -496,8 +514,58 @@ function searchNokoriHai(haisCount){
     return result_list;
 }
 
-//再帰的に手牌をブロックとして分割
-function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count){
+//再帰的にアガリ牌をブロックとして分割してブロックを返す
+function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, tehai_list){
+    let result_list = [];
+    for(let i = 0; i < PAI_TYPE_NUM; i++){
+        let haishu = Math.floor(i / 9);
+        let count = hais_count[haishu][i % 9];
+        //雀頭、対子の処理
+        if(count >= 2){
+            let copied_hais = copyCountArray(hais_count);
+            copied_hais[haishu][i % 9] -= 2;
+            let tehai_list_new = copyArray(tehai_list);
+            tehai_list_new.push([i + 1, i + 1]);
+            //再帰呼び出し
+            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count, toitsu_count + 1, tehai_list_new));
+        }
+        //刻子の処理
+        if(count >= 3){
+            let copied_hais = copyCountArray(hais_count);
+            copied_hais[haishu][i % 9] -= 3;
+            let tehai_list_new = copyArray(tehai_list);
+            tehai_list_new.push([i + 1, i + 1, i + 1]);
+            //再帰呼び出し
+            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
+        }
+
+        //字牌なら対子、刻子の処理のみで終了させる
+        if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
+            continue;
+        }
+
+        //順子（面子）の処理
+        if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
+            let copied_hais = copyCountArray(hais_count);
+            copied_hais[haishu][i % 9]--;
+            copied_hais[haishu][i % 9 + 1]--;
+            copied_hais[haishu][i % 9 + 2]--;
+            let tehai_list_new = copyArray(tehai_list);
+            tehai_list_new.push([i + 1, i + 2, i + 3]);
+            //再帰呼び出し
+            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
+        }
+    }
+    //分割完了時、4面子1雀頭または対子が7つまたは国士無双であればリストに追加
+    if((mentsu_count + naki_pais_list.length == 4 && toitsu_count == 1) || toitsu_count == 7){
+        result_list.push(tehai_list.sort());
+    }
+
+    return result_list;
+}
+
+//再帰的に手牌をブロックとして分割（聴牌判定時のみ使用）
+function createTenpaiHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count){
     let result_list = [];
     for(let i = 0; i < PAI_TYPE_NUM; i++){
         let haishu = Math.floor(i / 9);
@@ -516,7 +584,7 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
             }
             copied_hais[haishu][i % 9] -= 2;
             //再帰呼び出し
-            result_list = result_list.concat(createHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1));
+            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1));
         }
         //刻子の処理
         if(count >= 3){
@@ -532,7 +600,7 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
                 }
             }
             //再帰呼び出し
-            result_list = result_list.concat(createHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count))
+            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count))
         }
         //字牌なら対子、刻子の処理のみで終了させる
         if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
@@ -554,7 +622,7 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
                 }
             }
             //再帰呼び出し
-            result_list = result_list.concat(createHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count));
+            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count));
         }
         //カンチャン（塔子）の処理
         if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
@@ -569,7 +637,7 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
                 }
             }
             //再帰呼び出し
-            result_list = result_list.concat(createHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
+            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
         }
         //ペンチャン、両面の処理
         if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1){
@@ -603,7 +671,7 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
                 }
             }
             //再帰呼び出し
-            result_list = result_list.concat(createHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
+            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
         }           
     }
     //分解が終了したら結果を記憶する
@@ -615,12 +683,17 @@ function createHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu
 }
 
 //テスト（分解結果を返す）
-function test_getBlockResult(){
+function test_getAgariBlockResult(){
     let hais_count = countHais();
     let result_list = new Array(1);
-    result_list = createHaiBlocksRecursive(hais_count, 0, 0, 0);
+    result_list = createAgariHaiBlocksRecursive(hais_count, 0, 0, []);
     result_list = [...new Set(result_list.map(JSON.stringify))].map(JSON.parse);
 
+    for(let i = 0; i < result_list.length; i++){
+        //手牌のリストを一定のルールでソートする
+        tehaiListSort(result_list[i]);
+    }
+    
     return result_list;
 }
 
@@ -628,7 +701,7 @@ function test_getBlockResult(){
 function calcIppanteShanten(haisCount){
     //分解結果を記憶する変数
     let result_list = new Array(1);
-    result_list = createHaiBlocksRecursive(haisCount, 0, 0, 0);
+    result_list = createTenpaiHaiBlocksRecursive(haisCount, 0, 0, 0);
     result_list = [...new Set(result_list.map(JSON.stringify))].map(JSON.parse);
 
     //最小のシャンテン数を探す
@@ -1028,6 +1101,335 @@ function changeJikaze(jikaze_new){
     modalJikazeClose();
 }
 
+//国士無双の雀頭を取得
+function getKokushiJanto(hais_count){
+    for(let i = 0; i < hais_count.length; i++){
+        for(let j = 0; j < hais_count[i].length; j++){
+            //2枚以上あれば対子として返す
+            if(hais_count[i][j] >= 2){
+                return (i * 9) + (j + 1);
+            }
+        }
+    }
+
+    return -1;
+}
+
+//手配のリストを一定のルールでソートする
+function tehaiListSort(tehai_list){
+    //数値の小さい面子、対子の順にソートする
+    for(let i = 0; i < tehai_list.length - 1; i++){
+        let m = i;
+        for(let j = i + 1; j < tehai_list.length; j++){
+            if(tehai_list[j][0] < tehai_list[m][0]){
+                m = j;
+            }
+        }
+        let temp = tehai_list[i];
+        tehai_list[i] = tehai_list[m];
+        tehai_list[m] = temp;
+    }
+
+    //4面子1雀頭の場合のみ雀頭を先頭にソートする
+    if(tehai_list.length + naki_pais_list.length == 5){
+        let toitsu_index = 0;
+        //対子を探す
+        for(let i = 0; i < 5; i++){
+            //対子があればそのインデックスを取得する
+            if(tehai_list[i].length == 2){
+                toitsu_index = i;
+                break;
+            }
+        }
+        //ソート
+        for(let i = toitsu_index; i > 0; i--){
+            let temp = tehai_list[i];
+            tehai_list[i] = tehai_list[i - 1];
+            tehai_list[i - 1] = temp;
+        }
+    }
+}
+
+//刻子かどうかを判定
+function isCotsu(mentsu_list){
+    if(mentsu_list.length != 3){
+        return false;
+    }
+    for(let i = 0; i < mentsu_list.length - 1; i++){
+        if(mentsu_list[i] != mentsu_list[i + 1]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//四暗刻の判定
+function hanteiSuuanko(agari_list, agari_kata){
+    //面前役
+    if(isMenzen()){
+        let anko_count = 0;
+        //手牌を見る
+        for(let i = 0; i < agari_list.length; i++){
+            //面子が刻子かどうか調べる
+            if(isCotsu(agari_list[i])){
+                //アガリ牌が刻子のロンの場合、暗刻として認めない
+                if(!(agari_hai == agari_list[i][0] && agari_kata == Agari_Kata.ron)){
+                    anko_count++;
+                }
+            }
+        }
+        //鳴き牌を見る
+        for(let i = 0; i < naki_type_list.length; i++){
+            //暗槓の場合、暗刻としてカウントする
+            if(naki_type_list[i] == Naki_Type.ankan){
+                anko_count++;
+            }
+        }
+
+        //暗刻が4個であれば四暗刻
+        if(anko_count == 4){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+}
+
+//大三元の判定
+function hanteiDaisangen(agari_list){
+    //三元牌があるかどうかのフラグ
+    let haku_exist = false;
+    let hatsu_exist = false;
+    let chun_exist = false;
+    
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        //面子が刻子かどうか調べる
+        if(isCotsu(agari_list[i])){
+            let haishu = agari_list[i][0];
+            //白かどうか
+            if(haishu == JIHAI[4]){
+                haku_exist = true;
+            }
+            //発かどうか
+            else if(haishu == JIHAI[5]){
+                hatsu_exist = true;
+            }
+            //中かどうか
+            else if(haishu == JIHAI[6]){
+                chun_exist = true;
+            }
+        }
+    }
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        //チー以外の場合を対象にする
+        if(!(naki_type_list[i] == Naki_Type.chi)){
+            //白かどうか
+            if(naki_pais_list[i] == JIHAI[4]){
+                haku_exist = true;
+            }
+            //発かどうか
+            else if(naki_pais_list[i] == JIHAI[5]){
+                hatsu_exist = true;
+            }
+            //中かどうか
+            else if(naki_pais_list[i] == JIHAI[6]){
+                chun_exist = true;
+            }
+        }
+    }
+
+    //三種類とも含まれていれば役が成立
+    if(haku_exist && hatsu_exist && chun_exist){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//四喜和の判定
+function hanteiSushiho(agari_list){
+    //四風牌があるかどうかのフラグ
+    let ton_exist = false;
+    let nan_exist = false;
+    let sha_exist = false;
+    let pei_exist = false;
+    let janto_kazehai = false;
+
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        let haishu = agari_list[i][0];
+        let found_flg = false;
+        //東かどうか
+        if(haishu == JIHAI[0]){
+            ton_exist = true;
+            found_flg = true;
+        }
+        //南かどうか
+        else if(haishu == JIHAI[1]){
+            nan_exist = true;
+            found_flg = true;
+        }
+        //西かどうか
+        else if(haishu == JIHAI[2]){
+            sha_exist = true;
+            found_flg = true;
+        }
+        //北かどうか
+        else if(haishu == JIHAI[3]){
+            pei_exist = true;
+            found_flg = true;
+        }
+
+        //雀頭であれば雀頭フラグをONにする
+        if(found_flg && agari_list[i].length == 2){
+            janto_kazehai = true;
+        }
+    }
+
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        //チー以外の場合を対象にする
+        if(!(naki_type_list[i] == Naki_Type.chi)){
+           //東かどうか
+           if(naki_pais_list[i] == JIHAI[0]){
+                ton_exist = true;
+            }
+            //南かどうか
+            else if(naki_pais_list[i] == JIHAI[1]){
+                nan_exist = true;
+            }
+            //西かどうか
+            else if(naki_pais_list[i] == JIHAI[2]){
+                sha_exist = true;
+            }
+            //北かどうか
+            else if(naki_pais_list[i] == JIHAI[3]){
+                pei_exist = true;
+            }
+        }
+    }
+
+    //3種類が刻子、1種類が雀頭であれば小四喜が成立
+    if(ton_exist && nan_exist && sha_exist && pei_exist && janto_kazehai){
+        return 0;
+    }
+    //4種類とも刻子であれば大四喜が成立
+    else if(ton_exist && nan_exist && sha_exist && pei_exist){
+        return 1;
+    }
+    else{
+        return -1;
+    }
+}
+
+//字一色の判定
+function hanteiTsuiso(agari_list){
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        let haishu = agari_list[i][0];
+        //牌の先頭が字牌でなければ字一色でない
+        if(!(haishu >= JIHAI[0] && haishu <= JIHAI[6])){
+            return false;
+        }
+    }
+
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        if(!(naki_pais_list[i] >= JIHAI[0] && naki_pais_list[i] <= JIHAI[6])){
+            return false;
+        }
+    }
+
+    //全て字牌であれば役が成立
+    return true;
+}
+
+//役満をまとめて判定
+function hanteiYakumans(agari_list, agari_kata, yaku_list){
+    //四暗刻
+    if(hanteiSuuanko(agari_list, agari_kata)){
+        //アガリ牌が雀頭であれば四暗刻単騎
+        if(agari_hai == agari_list[0][0]){
+            yaku_list.push("四暗刻単騎待ち");
+        }
+        //通常の四暗刻
+        else{
+            yaku_list.push("四暗刻");
+        }
+    }
+    //大三元
+    if(hanteiDaisangen(agari_list)){
+        yaku_list.push("大三元")
+    }
+    //四喜和
+    if(hanteiSushiho(agari_list) == 0){
+        yaku_list.push("小四喜");
+    }
+    else if(hanteiSushiho(agari_list) == 1){
+        yaku_list.push("大四喜");
+    }
+    //字一色
+    if(hanteiTsuiso(agari_list)){
+        yaku_list.push("字一色");
+    }
+}
+
+//アガリの判定
+function agariCalc(agari_kata){
+    //国士無双のアガリであれば通常役の判定は行わない
+    if(calcKokushiShanten(countHais()) == -1){
+        let janto = getKokushiJanto(countHais());
+        //国士無双十三面待ち（アガリ牌が雀頭だった場合）
+        if(agari_hai == janto){
+            alert("国士無双十三面待ち");
+        }
+        //通常の国士無双
+        else{
+            alert("国士無双");
+        }
+    }
+    //4面子1雀頭または七対子型のアガリの場合
+    else{
+        let hais_count = countHais();
+        let agari_lists = new Array(1);
+        agari_lists = createAgariHaiBlocksRecursive(hais_count, 0, 0, []);
+        agari_lists = [...new Set(agari_lists.map(JSON.stringify))].map(JSON.parse);
+    
+        for(let i = 0; i < agari_lists.length; i++){
+            //翻数
+            let honsuu = 0;
+            //役のリスト
+            let yaku_list = [];
+            //手牌のリストを一定のルールでソートする
+            tehaiListSort(agari_lists[i]);
+
+            //対子が7個の形の場合は七対子かどうか判別する
+            if(agari_lists[i].length == 7){
+                if(calcChiitoiShanten(countHais()) == -1){
+                    //字一色七対子（大七星）の場合は七対子を付けない
+                }
+            }
+            //一般手の場合
+            else{
+                //役満の判定
+                hanteiYakumans(agari_lists[i], agari_kata, yaku_list);
+            }
+
+            //役を表示（テスト）
+            alert(yaku_list);
+        }
+
+    }  
+}
+
 //初期手配（全て裏返しの状態）の生成
 for(i = 0; i < TEHAI_NUMBER; i++){
     let div_element = document.createElement('div');
@@ -1251,7 +1653,10 @@ for(let i = 0; i < table_pais.length; i++){
         }
         //和了の場合
         else if(mode_current == Mode.agari && agarihai_list.includes(pai_num)){
+            //和了ダイヤログを表示
             modal_agari.style.display = "block";
+            //アガリ牌を記憶
+            agari_hai = pai_num;
         }
 
         //手牌の空きが2枚以上であれば状態テロップの枚数を減らす（通常モード時のみ）
@@ -1439,9 +1844,11 @@ function modalAgariClose(){
 }
 //ツモボタンをクリックした時
 function btn_tsumo_click(){
+    agariCalc(Agari_Kata.tsumo);
 }
 //ロンボタンをクリックした時
 function btn_ron_click(){
+    agariCalc(Agari_Kata.ron);
 }
 //場風用ダイヤログが閉じたときの処理
 function modalBakazeClose(){
