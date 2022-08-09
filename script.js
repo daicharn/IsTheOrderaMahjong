@@ -49,6 +49,14 @@ const Agari_Kata = {
     ron : 1
 }
 
+//牌種
+const Hais_Type = {
+    manzu : 0,
+    pinzu : 1,
+    souzu : 2,
+    jihai : 3
+}
+
 //現在の手配の数
 let tehai_current = 0;
 
@@ -1101,13 +1109,36 @@ function changeJikaze(jikaze_new){
     modalJikazeClose();
 }
 
-//国士無双の雀頭を取得
+//国士無双の雀頭を取得（国士無双成立時のみ使用）
 function getKokushiJanto(hais_count){
     for(let i = 0; i < hais_count.length; i++){
         for(let j = 0; j < hais_count[i].length; j++){
             //2枚以上あれば対子として返す
             if(hais_count[i][j] >= 2){
                 return (i * 9) + (j + 1);
+            }
+        }
+    }
+
+    return -1;
+}
+
+//九連宝燈の一枚多い牌を取得（九連宝燈成立時のみ使用）
+function getChurenMuchHai(hais_count){
+    //数牌のみ判定
+    for(let i = 0; i < hais_count.length - 1; i++){
+        for(let j = 0; j < hais_count[i].length; j++){
+            //1、9の場合は4枚あれば1枚多い
+            if(j == 0 || j == 8){
+                if(hais_count[i][j] == 4){
+                    return (i * 9) + (j + 1);
+                }
+            }
+            //2～8の場合は2枚あれば1枚多い
+            else{
+                if(hais_count[i][j] == 2){
+                    return (i * 9) + (j + 1);
+                }
             }
         }
     }
@@ -1164,8 +1195,22 @@ function isCotsu(mentsu_list){
     return true;
 }
 
+//雀頭かどうか判定
+function isJanto(mentsu_list){
+    if(mentsu_list.length != 2){
+        return false;
+    }
+    for(let i = 0; i < mentsu_list.length - 1; i++){
+        if(mentsu_list[i] != mentsu_list[i + 1]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 //四暗刻の判定
-function hanteiSuuanko(agari_list, agari_kata){
+function isSuuanko(agari_list, agari_kata){
     //面前役
     if(isMenzen()){
         let anko_count = 0;
@@ -1201,7 +1246,7 @@ function hanteiSuuanko(agari_list, agari_kata){
 }
 
 //大三元の判定
-function hanteiDaisangen(agari_list){
+function isDaisangen(agari_list){
     //三元牌があるかどうかのフラグ
     let haku_exist = false;
     let hatsu_exist = false;
@@ -1331,7 +1376,7 @@ function hanteiSushiho(agari_list){
 }
 
 //字一色の判定
-function hanteiTsuiso(agari_list){
+function isTsuiso(agari_list){
     //手牌を見る
     for(let i = 0; i < agari_list.length; i++){
         let haishu = agari_list[i][0];
@@ -1352,33 +1397,280 @@ function hanteiTsuiso(agari_list){
     return true;
 }
 
+//清老頭の判定
+function isChinroto(agari_list){
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        //刻子または雀頭の場合
+        if(isCotsu(agari_list[i]) || isJanto(agari_list[i])){
+            let haishu = agari_list[i][0];
+            //先頭の牌が老頭牌でなければ不成立
+            if(!(((haishu - 1) % 9 == 0 || (haishu - 1) % 9 == 8) && haishu < JIHAI[0])){
+                return false;
+            }
+        }
+        //順子の場合は不成立
+        else{
+            return false;
+        }
+    }
+
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        //チー以外の場合
+        if(!(naki_type_list[i] == Naki_Type.chi)){
+            let haishu = naki_pais_list[i];
+            //牌が老頭牌でなければ不成立
+            if(!(((haishu - 1) % 9 == 0 || (haishu - 1) % 9 == 8) && haishu < JIHAI[0])){
+                return false;
+            }
+        }
+        //チーがあれば不成立
+        else{
+            return false;
+        }
+    }
+
+    //条件に全て合致すれば役が成立
+    return true;
+}
+
+//緑一色の判定
+function isRyuiso(agari_list){
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        let haishu = agari_list[i][0];
+        //刻子または雀頭の場合
+        if(isCotsu(agari_list[i]) || isJanto(agari_list[i])){
+            //先頭の牌が索子の2,3,4,6,8または発でなければ不成立
+            if(!(haishu == SOUZU[1] || haishu == SOUZU[2] || haishu == SOUZU[3] || haishu == SOUZU[5] || haishu == SOUZU[7] || haishu == JIHAI[5])){
+                return false;
+            }
+        }
+        //順子の場合
+        else{
+            //先頭の牌が索子の2でなければ不成立
+            if(!(haishu == SOUZU[1])){
+                return false;
+            }
+        }
+    }
+
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        let haishu = naki_pais_list[i];
+        //チー以外の場合
+        if(!(naki_type_list[i] == Naki_Type.chi)){
+            //牌が索子の2,3,4,6,8または発でなければ不成立
+            if(!(haishu == SOUZU[1] || haishu == SOUZU[2] || haishu == SOUZU[3] || haishu == SOUZU[5] || haishu == SOUZU[7] || haishu == JIHAI[5])){
+                return false;
+            }
+        }
+        //チーの場合
+        else{
+            //先頭の牌が索子の2でなければ不成立
+            if(!(haishu == SOUZU[1])){
+                return false;
+            }
+        }
+    }
+
+    //条件に全て合致すれば役が成立
+    return true;
+}
+
+//九連宝燈の判定
+function isChurenPoto(agari_list){
+    //面前の清一色を前提条件とする
+    if(hanteiChinitsu(agari_list) == 6){
+        let hais_count = new Array(9).fill(0);
+        //手牌を見る
+        for(let i = 0; i < agari_list.length; i++){
+            for(let j = 0; j < agari_list[i].length; j++){
+                let pai_num = agari_list[i][j];
+                //対応する数牌のカウントを1増やす
+                hais_count[(pai_num - 1) % 9]++;
+            }
+        }
+        //牌のカウントを確認
+        for(let i = 0; i < hais_count.length; i++){
+            //1、9の場合は3枚以上必要
+            if(i == 0 || i == 8){
+                if(hais_count[i] < 3){
+                    return false;
+                }
+            }
+            //2～8は1枚以上必要
+            else{
+                if(hais_count[i] < 1){
+                    return false;
+                }
+            }
+        }
+
+        //すべての条件が成立したら役が成立
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//四槓子の判定
+function isSuukantsu(){
+    let kan_count = 0;
+    //鳴き牌のみを見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        //暗槓、明槓の両方をカウントする
+        if(naki_type_list[i] == Naki_Type.ankan || naki_type_list[i] == Naki_Type.minkan){
+            kan_count++;
+        }
+    }
+
+    //カンが4回あれば役が成立
+    if(kan_count == 4){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//清一色の判定
+function hanteiChinitsu(agari_list){
+    //先頭の牌種を特定する
+    let firstHai = agari_list[0][0];
+    let hai_type = 0;
+    //萬子
+    if(firstHai >= MANZU[0] && firstHai <= MANZU[8]){
+        hai_type = Hais_Type.manzu;
+    }
+    //筒子
+    else if(firstHai >= PINZU[0] && firstHai <= PINZU[8]){
+        hai_type = Hais_Type.pinzu;
+    }
+    //索子
+    else if(firstHai >= SOUZU[0] && firstHai <= SOUZU[8]){
+        hai_type = Hais_Type.souzu;
+    }
+    //字牌の場合は不成立
+    else{
+        return 0;
+    }
+
+    //手牌を見る
+    for(let i = 0; i < agari_list.length; i++){
+        for(let j = 0; j < agari_list[i].length; j++){
+            let pai_num = agari_list[i][j];
+            //萬子の場合
+            if(hai_type == Hais_Type.manzu){
+                //萬子でなければ不成立
+                if(!(pai_num >= MANZU[0] && pai_num <= MANZU[8])){
+                    return 0;
+                }
+            }
+            //筒子の場合
+            else if(hai_type == Hais_Type.pinzu){
+                //筒子でなければ不成立
+                if(!(pai_num >= PINZU[0] && pai_num <= PINZU[8])){
+                    return 0;
+                }
+            }
+            //索子の場合
+            else if(hai_type == Hais_Type.souzu){
+                //索子でなければ不成立
+                if(!(pai_num >= SOUZU[0] && pai_num <= SOUZU[8])){
+                    return 0;
+                }
+            }
+        }
+    }
+
+    //鳴き牌を見る
+    for(let i = 0; i < naki_type_list.length; i++){
+        let pai_num = naki_pais_list[i];
+        //萬子の場合
+        if(hai_type == Hais_Type.manzu){
+            //萬子でなければ不成立
+            if(!(pai_num >= MANZU[0] && pai_num <= MANZU[8])){
+                return 0;
+            }
+        }
+        //筒子の場合
+        else if(hai_type == Hais_Type.pinzu){
+            //筒子でなければ不成立
+            if(!(pai_num >= PINZU[0] && pai_num <= PINZU[8])){
+                return 0;
+            }
+        }
+        //索子の場合
+        else if(hai_type == Hais_Type.souzu){
+            //索子でなければ不成立
+            if(!(pai_num >= SOUZU[0] && pai_num <= SOUZU[8])){
+                return 0;
+            }
+        }
+    }
+
+    //面前であれば6翻
+    if(isMenzen()){
+        return 6;
+    }
+    else{
+        return 5;
+    }
+}
+
 //役満をまとめて判定
 function hanteiYakumans(agari_list, agari_kata, yaku_list){
     //四暗刻
-    if(hanteiSuuanko(agari_list, agari_kata)){
+    if(isSuuanko(agari_list, agari_kata)){
         //アガリ牌が雀頭であれば四暗刻単騎
         if(agari_hai == agari_list[0][0]){
-            yaku_list.push("四暗刻単騎待ち");
+            yaku_list.push(["役満","四暗刻単騎待ち"]);
         }
         //通常の四暗刻
         else{
-            yaku_list.push("四暗刻");
+            yaku_list.push(["役満","四暗刻"]);
         }
     }
     //大三元
-    if(hanteiDaisangen(agari_list)){
-        yaku_list.push("大三元")
+    if(isDaisangen(agari_list)){
+        yaku_list.push(["役満","大三元"]);
     }
     //四喜和
     if(hanteiSushiho(agari_list) == 0){
-        yaku_list.push("小四喜");
+        yaku_list.push(["役満","小四喜"]);
     }
     else if(hanteiSushiho(agari_list) == 1){
-        yaku_list.push("大四喜");
+        yaku_list.push(["役満","大四喜"]);
     }
     //字一色
-    if(hanteiTsuiso(agari_list)){
-        yaku_list.push("字一色");
+    if(isTsuiso(agari_list)){
+        yaku_list.push(["役満","字一色"]);
+    }
+    //清老頭
+    if(isChinroto(agari_list)){
+        yaku_list.push(["役満","清老頭"]);
+    }
+    //緑一色
+    if(isRyuiso(agari_list)){
+        yaku_list.push(["役満","緑一色"]);
+    }
+    //九連宝燈
+    if(isChurenPoto(agari_list)){
+        //1枚多い牌がアガリ牌であれば純正九連宝燈
+        if(agari_hai == getChurenMuchHai(countHais())){
+            yaku_list.push(["役満","純正九連宝燈"]);
+        }
+        //通常の九連宝燈
+        else{
+            yaku_list.push(["役満","九連宝燈"]);
+        }
+    }
+    //四槓子
+    if(isSuukantsu()){
+        yaku_list.push(["役満","四槓子"]);
     }
 }
 
@@ -1389,11 +1681,11 @@ function agariCalc(agari_kata){
         let janto = getKokushiJanto(countHais());
         //国士無双十三面待ち（アガリ牌が雀頭だった場合）
         if(agari_hai == janto){
-            alert("国士無双十三面待ち");
+            alert(["役満","国士無双十三面待ち"]);
         }
         //通常の国士無双
         else{
-            alert("国士無双");
+            alert(["役満","国士無双"]);
         }
     }
     //4面子1雀頭または七対子型のアガリの場合
@@ -1415,12 +1707,39 @@ function agariCalc(agari_kata){
             if(agari_lists[i].length == 7){
                 if(calcChiitoiShanten(countHais()) == -1){
                     //字一色七対子（大七星）の場合は七対子を付けない
+                    if(isTsuiso(agari_lists[i])){
+                        yaku_list.push(["役満","字一色"]);
+                    }
+                    else{
+                        //七対子を役として追加
+                        honsuu += 2
+                        yaku_list.push(["2翻","七対子"]);
+
+                        //清一色
+                        if(hanteiChinitsu(agari_lists[i]) == 6){
+                            honsuu += 6;
+                            yaku_list.push(["6翻","清一色"]);
+                        }
+                    }
                 }
             }
             //一般手の場合
             else{
                 //役満の判定
                 hanteiYakumans(agari_lists[i], agari_kata, yaku_list);
+
+                //役満でない場合、一般役の判定を行う    
+                if(yaku_list.length == 0){
+                    //清一色
+                    if(hanteiChinitsu(agari_lists[i]) == 6){
+                        honsuu += 6;
+                        yaku_list.push(["6翻","清一色"]);
+                    }
+                    else if(hanteiChinitsu(agari_lists[i]) == 5){
+                        honsuu += 5;
+                        yaku_list.push(["5翻","清一色"]);
+                    }
+                }
             }
 
             //役を表示（テスト）
