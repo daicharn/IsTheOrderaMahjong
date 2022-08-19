@@ -137,6 +137,10 @@ let modal_agari = document.getElementById('modal_agari');
 let modal_bakaze = document.getElementById('modal_bakaze');
 let modal_jikaze = document.getElementById('modal_jikaze');
 
+//手配入力・結果出力画面のオブジェクト
+let input_screen = document.getElementById('input_screen');
+let output_screen = document.getElementById('output_screen');
+
 //状態テロップの文字を変更
 function stateText_change(str){
     let stateText = document.getElementById('state_text');
@@ -1345,7 +1349,7 @@ function getMachiTypes(agari_list){
             }
         }
         //刻子
-        else if(isCotsu(agari_list[i])){
+        if(isCotsu(agari_list[i])){
             //アガリ牌が先頭の牌と一致すればシャンポン待ち
             if(agari_hai == haishu_first){
                 if(!(result_list.includes(Machi_Type.shanpon))){
@@ -2253,25 +2257,17 @@ function isShosangen(agari_list){
         //チー以外の場合を対象にする
         if(!(naki_type_list[i] == Naki_Type.chi)){
             let haishu = naki_pais_list[i];
-            let found_flg = false;
             //白かどうか
             if(haishu == JIHAI[4]){
                 haku_exist = true;
-                found_flg = true;
             }
             //発かどうか
             else if(haishu == JIHAI[5]){
                 hatsu_exist = true;
-                found_flg = true;
             }
             //中かどうか
             else if(haishu == JIHAI[6]){
                 chun_exist = true;
-                found_flg = true;
-            }
-
-            if(found_flg && isJanto(agari_list[i])){
-                janto_flg = true;
             }
         }
     }
@@ -2657,7 +2653,7 @@ function hanteiYakumans(agari_list, agari_kata, yaku_list){
     }
 }
 
-//点数計算
+//点数計算（数値）
 function calcTensuu(honsuu, fusuu, yakuman_flg, yakuman_num){
     let tensuu = 0;
     let bairitsu = 1;
@@ -2684,7 +2680,7 @@ function calcTensuu(honsuu, fusuu, yakuman_flg, yakuman_num){
     }
     //倍満（8,9,10翻）の場合
     else if(honsuu >= 8 && honsuu <= 10){
-        tensuu = 18000 * bairitsu;
+        tensuu = 16000 * bairitsu;
     }
     //三倍満（11,12翻）の場合
     else if(honsuu >= 11 && honsuu <= 12){
@@ -2703,6 +2699,65 @@ function calcTensuu(honsuu, fusuu, yakuman_flg, yakuman_num){
     return tensuu;
 }
 
+//点数計算（文字列）
+function calcTensuuStr(honsuu, fusuu, yakuman_flg, yakuman_num){
+    let tensuu_str = "";
+    let bairitsu = 1;
+    //親の場合、倍率を1.5倍にする
+    if(jikaze == Kaze_Type.ton){
+        bairitsu = 1.5;
+    }
+
+    //1翻以上4翻以下の場合
+    if(honsuu >= 1 && honsuu <= 4){
+        let tensuu = Math.ceil((fusuu * 32 * bairitsu) * (2 ** (honsuu - 1)) / 100) * 100;
+        //親の場合12000点、子の場合8000点以上であれば満貫とする
+        if(tensuu > 8000 * bairitsu){
+            tensuu_str = "満貫";
+        }
+        else{
+            tensuu_str = honsuu.toString() + "翻" + fusuu.toString() + "符";
+        }
+    }
+    //満貫（5翻）の場合
+    else if(honsuu == 5){
+        tensuu_str = "満貫";
+    }
+    //跳満（6,7翻）の場合
+    else if(honsuu >= 6 && honsuu <= 7){
+        tensuu_str = "跳満";
+    }
+    //倍満（8,9,10翻）の場合
+    else if(honsuu >= 8 && honsuu <= 10){
+        tensuu_str = "倍満";
+    }
+    //三倍満（11,12翻）の場合
+    else if(honsuu >= 11 && honsuu <= 12){
+        tensuu_str = "三倍満";
+    }
+    //数え役満（13翻以上）の場合
+    else if(honsuu >= 13){
+        tensuu_str = "役満";
+    }
+        
+    //役満の場合
+    if(yakuman_flg){
+        if(yakuman_num == 1){
+            tensuu_str = "役満";
+        }
+        else if(yakuman_num > 1){
+            tensuu_str = yakuman_num.toString() + "倍役満";
+        }
+    }
+
+    //役なしの場合
+    if(!yakuman_flg && honsuu == 0){
+        tensuu_str = "役なし";
+    }
+
+    return tensuu_str;
+}
+
 //アガリの判定
 function calcAgari(agari_kata){
     //翻数のリスト
@@ -2717,14 +2772,20 @@ function calcAgari(agari_kata){
     let yakuman_flg_list = [];
     //点数
     let tensuu = -1;
+    //点数（文字）
+    let tensuu_str = "";
     //最大点数の手牌のインデックス
     let maxtensuu_index = 0;
     //最大点数の符数
     let maxtensuu_fusuu = 0;
+    //アガリ牌のリスト
+    let agari_lists = [];
 
     //国士無双のアガリであれば通常役の判定は行わない
     if(calcKokushiShanten(countHais()) == -1){
+        let count_hais = countHais();
         let yaku_list = [];
+        let agari_list = [];
         let fusuu = 0;
         let fusuu_summary_list = [];
 
@@ -2736,6 +2797,15 @@ function calcAgari(agari_kata){
         //通常の国士無双
         else{
             yaku_list.push(["役満","国士無双"]);
+        }
+
+        //アガリのリストを生成する
+        for(let i = 0; i < count_hais.length; i++){
+            for(let j = 0; j < count_hais[i].length; j++){
+                for(let k = 0; k < count_hais[i][j]; k++){
+                    agari_list.push([(i * 9) + (j + 1)]);
+                }
+            }
         }
 
         //副底（20符）
@@ -2753,17 +2823,16 @@ function calcAgari(agari_kata){
             fusuu_summary_list.push(["10符","面前ロン"]);
         }
 
+        agari_lists.push(agari_list);
         honsuu_list.push(0);
         fusuu_list.push(fusuu);
         yaku_lists.push(yaku_list);
         fusuu_summary_lists.push(fusuu_summary_list);
-
         yakuman_flg_list.push(true);
     }
     //4面子1雀頭または七対子型のアガリの場合
     else{
         let hais_count = countHais();
-        let agari_lists = new Array(1);
         agari_lists = createAgariHaiBlocksRecursive(hais_count, 0, 0, []);
         agari_lists = [...new Set(agari_lists.map(JSON.stringify))].map(JSON.parse);
     
@@ -3175,32 +3244,490 @@ function calcAgari(agari_kata){
     //点数の決定
     for(let i = 0; i < yaku_lists.length; i++){
         //手牌の点数を計算する
-        let fusuu_ceil = Math.ceil(fusuu_list[i] / 10) * 10;
+        let fusuu_ceil = 0;
+        if(fusuu_list[i] != 25){
+            fusuu_ceil = Math.ceil(fusuu_list[i] / 10) * 10;
+        }
+        else{
+            fusuu_ceil = fusuu_list[i];
+        }
         let tensuu_candidate = 0;
+        let tensuu_str_candidate = "";
         //役満（数え役満を除く）の場合
         if(yakuman_flg_list[i]){
             tensuu_candidate = calcTensuu(honsuu_list[i], fusuu_ceil, true, yaku_lists[i].length);
+            tensuu_str_candidate = calcTensuuStr(honsuu_list[i], fusuu_ceil, true, yaku_lists[i].length);
         }
         //通常の役満以外の場合
         else{
             tensuu_candidate = calcTensuu(honsuu_list[i], fusuu_ceil, false, 0);
+            tensuu_str_candidate = calcTensuuStr(honsuu_list[i], fusuu_ceil, false, 0);
         }
 
         //最大の点数であればその点数と添え字を記憶する
         if(tensuu < tensuu_candidate){
             tensuu = tensuu_candidate;
+            tensuu_str = tensuu_str_candidate;
             maxtensuu_index = i;
             maxtensuu_fusuu = fusuu_ceil;
         }
     }
-    
+
+    //入力画面を非表示にして結果出力画面を表示
+    input_screen.style.display = "none";
+    output_screen.style.display = "block";
+    //アガリ牌を画面上に表示
+    displayAgarihai(agari_kata);
+    //アガリの手牌を画面上に表示
+    displayTehaiResult(agari_lists[maxtensuu_index]);
+    //点数を画面上に表示
+    displayTensuu(tensuu, tensuu_str, agari_kata);
+    //翻数と役のリストを画面上に表示
+    displayYakuList(honsuu_list[maxtensuu_index], yaku_lists[maxtensuu_index]);
+    //符数のリストを画面上に表示
+    displayFusuuList(fusuu_list[maxtensuu_index], maxtensuu_fusuu, fusuu_summary_lists[maxtensuu_index]);
+
     //各リストを表示（テスト）
+    /*
     alert(yaku_lists[maxtensuu_index]);
     alert(honsuu_list[maxtensuu_index]);
     alert(fusuu_list[maxtensuu_index]);
     alert(fusuu_summary_lists[maxtensuu_index]);
     alert(maxtensuu_fusuu);
     alert(tensuu);
+    */
+
+}
+
+//アガリ牌を画面に表示させる
+function displayAgarihai(agari_kata){
+    let div_element = document.createElement('div');
+    let p_element = document.createElement('p');
+    let img_element = document.createElement('img');
+    if(agari_kata == Agari_Kata.tsumo){
+        p_element.innerText = "ツモ";
+    }
+    else{
+        p_element.innerText = "ロン";
+    }
+    p_element.style.marginRight = "5px";
+    p_element.style.color = "white";
+    p_element.style.fontWeight = "bold";
+    document.getElementById('tehai_result').appendChild(p_element);
+
+    div_element.style.display = "flex";
+    div_element.style.marginRight = "15px";
+    div_element.style.backgroundColor = "red";
+    img_element.style.width = "40px";
+    img_element.style.opacity = "0.8";
+    img_element.src = generate_pai_src(agari_hai);
+    div_element.appendChild(img_element);
+    document.getElementById('tehai_result').appendChild(div_element);
+}
+
+
+//手牌の結果を画面に表示させる
+function displayTehaiResult(agari_list){
+    for(let i = 0; i < agari_list.length + naki_pais_list.length; i++){
+        let div_element = document.createElement('div');
+        div_element.style.display = "flex";
+        
+        //4面子1雀頭の形であれば面子、雀頭の隙間を確保する
+        if(agari_list.length + naki_pais_list.length == 5){
+            div_element.style.marginLeft = "10px";
+            div_element.style.marginRight = "10px";
+        }
+
+        //手牌
+        if(i < agari_list.length){
+            for(let j = 0; j < agari_list[i].length; j++){
+                let img_element = document.createElement('img');
+                img_element.style.width = "40px";
+                img_element.src = generate_pai_src(agari_list[i][j]);
+                div_element.appendChild(img_element);
+            }
+        }
+        //鳴き牌
+        else{
+            let pai_num = naki_pais_list[i - agari_list.length];
+            let naki_type = naki_type_list[i - agari_list.length];
+            //ポンの時
+            if(naki_type == Naki_Type.pong){
+                generatePongImg(div_element, pai_num, true);
+            }
+            //チーの時
+            else if(naki_type == Naki_Type.chi){
+                generateChiImg(div_element, pai_num, true);
+            }
+            //暗槓の時
+            else if(naki_type == Naki_Type.ankan){
+                generateAnkanImg(div_element, pai_num, true);
+            }
+            //明槓の時
+            else if(naki_type == Naki_Type.minkan){
+                generateMinkanImg(div_element, pai_num, true);
+            }
+        }
+        //鳴き牌
+        document.getElementById('tehai_result').appendChild(div_element);
+    }
+}
+//手牌の結果を消去
+function deleteTehaiResult(){
+    let tehai_result = document.getElementById('tehai_result');
+    while(tehai_result.firstChild){
+        tehai_result.removeChild(tehai_result.firstChild);
+    }
+}
+
+//点数を画面に表示させる
+function displayTensuu(tensuu, tensuu_str, agari_kata){
+    let tensuu_result_div = document.getElementById('tensuu_result');
+    let tensuu_str_p = document.createElement('p');
+    let tensuu_num_p = document.createElement('p');
+    tensuu_str_p.innerText = tensuu_str;
+    tensuu_result_div.appendChild(tensuu_str_p);
+    //ツモかつ0点でない場合
+    if(agari_kata == Agari_Kata.tsumo && tensuu != 0){
+        //親の場合
+        if(jikaze == Kaze_Type.ton){
+            let tensuu_all = Math.ceil((tensuu / 3) / 100) * 100; 
+            tensuu_num_p.innerText = tensuu_all.toString() + "点 ALL";
+        }
+        //子の場合
+        else{
+            let tensuu_child = Math.ceil((tensuu / 4) / 100) * 100; 
+            let tensuu_parent = Math.ceil((tensuu / 2) / 100) * 100;
+            tensuu_num_p.innerText = "子:" + tensuu_child.toString() + "点　親:" + tensuu_parent.toString() + "点";
+        }
+    }
+    //ロンの場合
+    else{
+        tensuu_num_p.innerText = tensuu.toString() + "点";
+    }
+
+    tensuu_result_div.appendChild(tensuu_num_p);
+}
+
+//画面の点数を消去
+function deleteTensuu(){
+    let tensuu_result_div = document.getElementById('tensuu_result');
+    while(tensuu_result_div.firstChild){
+        tensuu_result_div.removeChild(tensuu_result_div.firstChild);
+    }
+}
+
+//翻数と役のリストを画面に表示させる
+function displayYakuList(honsuu, yaku_list){
+    let table = document.getElementById('yaku_table');
+    let thead = document.createElement('thead');
+    let row_thead = document.createElement('tr');
+    let cell_thead = document.createElement('th');
+    let tbody = document.createElement('tbody');
+    cell_thead.innerHTML = "翻数：" + honsuu.toString();
+    cell_thead.colSpan = "2";
+    row_thead.appendChild(cell_thead);
+    thead.appendChild(row_thead);
+    table.appendChild(thead);
+
+    for(let i = 0; i < yaku_list.length; i++){
+        let row = document.createElement('tr');
+        let cell_honsuu = document.createElement('td');
+        let cell_yaku = document.createElement('td');
+        cell_honsuu.className = "width15";
+        cell_honsuu.innerText = yaku_list[i][0];
+        cell_yaku.innerText = yaku_list[i][1];
+        row.appendChild(cell_honsuu);
+        row.appendChild(cell_yaku);
+        tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+}
+//翻数と役のリストを削除
+function deleteYakuList(){
+    let table = document.getElementById('yaku_table');
+    while(table.firstChild){
+        table.removeChild(table.firstChild);
+    }
+}
+
+//符のパターンから符の詳細に関する文字列を取得
+function getFusuuSummaryStr(fusuu_summary){
+    //役牌雀頭
+    if(fusuu_summary == Fusuu_Pattern.yakuhai_janto){
+        return "役牌雀頭"
+    }
+    //単騎待ち
+    else if(fusuu_summary == Fusuu_Pattern.machi_tanki){
+        return "単騎待ち";
+    }
+    //カンチャン待ち
+    else if(fusuu_summary == Fusuu_Pattern.machi_kanchan){
+        return "間張待ち";
+    }
+    //ペンチャン待ち
+    else if(fusuu_summary == Fusuu_Pattern.machi_penchan){
+        return "辺張待ち";
+    }
+    //中張牌明刻
+    else if(fusuu_summary == Fusuu_Pattern.chuchan_minko){
+        return "中張牌明刻";
+    }
+    //中張牌暗刻
+    else if(fusuu_summary == Fusuu_Pattern.chuchan_anko){
+        return "中張牌暗刻";
+    }
+    //么九牌明刻
+    else if(fusuu_summary == Fusuu_Pattern.yaochu_minko){
+        return "么九牌明刻";
+    }
+    //么九牌暗刻
+    else if(fusuu_summary == Fusuu_Pattern.yaochu_anko){
+        return "么九牌暗刻";
+    }
+    //中張牌明槓
+    else if(fusuu_summary == Fusuu_Pattern.chuchan_minkan){
+        return "中張牌明槓";
+    }
+    //中張牌暗槓
+    else if(fusuu_summary == Fusuu_Pattern.chuchan_ankan){
+        return "中張牌暗槓";
+    }
+    //么九牌明槓
+    else if(fusuu_summary == Fusuu_Pattern.yaochu_minkan){
+        return "么九牌明槓";
+    }
+    //么九牌暗槓
+    else if(fusuu_summary == Fusuu_Pattern.yaochu_ankan){
+        return "么九牌暗槓";
+    }
+    else{
+        return "";
+    }
+}
+
+//符数のリストを表示させる
+function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
+    let table = document.getElementById('fusuu_table');
+    let thead = document.createElement('thead');
+    let row_thead = document.createElement('tr');
+    let cell_thead = document.createElement('th');
+    let tbody = document.createElement('tbody');
+    cell_thead.innerHTML = "符数：" + fusuu_ceil.toString() + "(" + fusuu.toString() + ")";
+    cell_thead.colSpan = "2";
+    row_thead.appendChild(cell_thead);
+    thead.appendChild(row_thead);
+    table.appendChild(thead);
+
+    for(let i = 0; i < fusuu_summary_list.length; i++){
+        let row = document.createElement('tr');
+        let cell_fusuu = document.createElement('td');
+        let cell_summary = document.createElement('td');
+        cell_fusuu.className = "width15";
+        cell_fusuu.innerText = fusuu_summary_list[i][0];
+        row.appendChild(cell_fusuu);
+
+        //符の付き方によって表示を変える
+        let fusuu_summary = fusuu_summary_list[i][1];
+        cell_summary_img = document.createElement('div');
+        //役牌雀頭
+        if(fusuu_summary == Fusuu_Pattern.yakuhai_janto){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            for(let j = 0; j < 2; j++){
+                let hai_image = document.createElement('img');
+                hai_image.src = generate_pai_src(fusuu_summary_list[i][2]);
+                hai_image.style.width = "40px";
+                cell_summary_img.appendChild(hai_image);
+            }
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //単騎待ち
+        else if(fusuu_summary == Fusuu_Pattern.machi_tanki){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            let hai_image_1 = document.createElement('img');
+            let hai_image_2 = document.createElement('img');
+            hai_image_1.src = generate_pai_src(agari_hai);
+            hai_image_1.style.width = "40px";
+            hai_image_2.src = generate_pai_src(BACK);
+            hai_image_2.style.width = "40px";
+            cell_summary_img.appendChild(hai_image_1);
+            cell_summary_img.appendChild(hai_image_2);
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //カンチャン待ち
+        else if(fusuu_summary == Fusuu_Pattern.machi_kanchan){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            for(let j = 0; j < 3; j++){
+                let hai_image = document.createElement('img');
+                //真ん中を裏返しにする
+                if(j != 1){
+                    hai_image.src = generate_pai_src(agari_hai - 1 + j);
+                }
+                else{
+                    hai_image.src = generate_pai_src(BACK);
+                }
+                hai_image.style.width = "40px";
+                cell_summary_img.appendChild(hai_image);
+            }
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //ペンチャン待ち
+        else if(fusuu_summary == Fusuu_Pattern.machi_penchan){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            for(let j = 0; j < 3; j++){
+                let hai_image = document.createElement('img');
+                //アガリ牌が3であれば右を隠す
+                if(agari_hai % 9 == 3){
+                    if(j == 2){
+                        hai_image.src = generate_pai_src(BACK);
+                    }
+                    else{
+                        hai_image.src = generate_pai_src(agari_hai - 2 + j);
+                    }
+                }
+                //アガリ牌が7であれば左を隠す
+                else if(agari_hai % 9 == 7){
+                    if(j == 0){
+                        hai_image.src = generate_pai_src(BACK);
+                    }
+                    else{
+                        hai_image.src = generate_pai_src(agari_hai + j);
+                    }
+                }
+                hai_image.style.width = "40px";
+                cell_summary_img.appendChild(hai_image);
+            }
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //刻子
+        else if(fusuu_summary == Fusuu_Pattern.chuchan_minko ||
+                fusuu_summary == Fusuu_Pattern.chuchan_anko || 
+                fusuu_summary == Fusuu_Pattern.yaochu_minko || 
+                fusuu_summary == Fusuu_Pattern.yaochu_anko){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            for(let j = 0; j < 3; j++){
+                let hai_image = document.createElement('img');
+                hai_image.src = generate_pai_src(fusuu_summary_list[i][2]);
+                hai_image.style.width = "40px";
+                cell_summary_img.appendChild(hai_image);
+            }
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //明槓
+        else if(fusuu_summary == Fusuu_Pattern.chuchan_minkan || fusuu_summary == Fusuu_Pattern.yaochu_minkan){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            generateMinkanImg(cell_summary_img, fusuu_summary_list[i][2], true);
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //暗槓
+        else if(fusuu_summary == Fusuu_Pattern.chuchan_ankan || fusuu_summary == Fusuu_Pattern.yaochu_ankan){
+            cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
+            generateAnkanImg(cell_summary_img, fusuu_summary_list[i][2], true);
+            cell_summary.appendChild(cell_summary_img);
+        }
+        //その他の場合は詳細のみをそのまま表示（画像は無し）
+        else{
+            cell_summary.innerText = fusuu_summary;
+        }
+
+        row.appendChild(cell_summary);
+
+        tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+}
+//符数のリストを削除
+function deleteFusuuList(){
+    let table = document.getElementById('fusuu_table');
+    while(table.firstChild){
+        table.removeChild(table.firstChild);
+    }
+}
+
+//ポンの時のimg要素を生成
+function generatePongImg(naki_pais_div, pai_num, size_min_flg){
+    for(let i = 0; i < 3; i++){
+        let naki_pais_img = document.createElement('img');
+        naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+        if(size_min_flg){
+            naki_pais_img.style.width = "40px";
+        }
+        if(i == 0){
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            if(size_min_flg){
+                naki_pais_img.style.marginLeft = "7px";
+                naki_pais_img.style.marginRight = "7px";
+            }
+            else{
+                naki_pais_img.style.marginLeft = "10px";
+                naki_pais_img.style.marginRight = "10px";
+            }
+        }
+        naki_pais_div.appendChild(naki_pais_img);
+    }
+}
+
+//チーの時のimg要素を生成
+function generateChiImg(naki_pais_div, pai_num, size_min_flg){
+    for(let i = 0; i < 3; i++){
+        let naki_pais_img = document.createElement('img');
+        naki_pais_img.setAttribute('src', generate_pai_src(pai_num + i));
+        if(size_min_flg){
+            naki_pais_img.style.width = "40px";
+        }
+        if(i == 0){
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            if(size_min_flg){
+                naki_pais_img.style.marginLeft = "7px";
+                naki_pais_img.style.marginRight = "7px";
+            }
+            else{
+                naki_pais_img.style.marginLeft = "10px";
+                naki_pais_img.style.marginRight = "10px";
+            }
+        }
+        naki_pais_div.appendChild(naki_pais_img);
+    }
+}
+
+//暗槓の時のimg要素を生成
+function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
+    for(let i = 0; i < 4; i++){
+        let naki_pais_img = document.createElement('img');
+        if(size_min_flg){
+            naki_pais_img.style.width = "40px";
+        }
+        if(i == 0 || i == 3){
+            naki_pais_img.setAttribute('src', generate_pai_src(BACK));
+        }
+        else{
+            naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+        }
+        naki_pais_div.appendChild(naki_pais_img);
+    }
+}
+
+//明槓の時のimg要素を生成
+function generateMinkanImg(naki_pais_div, pai_num, size_min_flg){
+    for(let i = 0; i < 4; i++){
+        let naki_pais_img = document.createElement('img');
+        naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+        if(size_min_flg){
+            naki_pais_img.style.width = "40px";
+        }
+        if(i == 0){
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            if(size_min_flg){
+                naki_pais_img.style.marginLeft = "7px";
+                naki_pais_img.style.marginRight = "7px";
+            }
+            else{
+                naki_pais_img.style.marginLeft = "10px";
+                naki_pais_img.style.marginRight = "10px";
+            }
+        }
+        naki_pais_div.appendChild(naki_pais_img);
+    }
 }
 
 //初期手配（全て裏返しの状態）の生成
@@ -3273,10 +3800,6 @@ for(let i = 0; i < table_pais.length; i++){
         //押された牌の種類を番号として取得
         let pai_num = Number(table_pais[i].id);
         let naki_pais_div = document.getElementById('naki_' + (naki_pais_list.length + 1));
-        let naki_pais_img_1 = document.createElement('img');
-        let naki_pais_img_2 = document.createElement('img');
-        let naki_pais_img_3 = document.createElement('img');
-        let naki_pais_img_4 = document.createElement('img');
         //テーブル押下時点でのモードを記憶
         mode_old = mode_current;
 
@@ -3291,15 +3814,8 @@ for(let i = 0; i < table_pais.length; i++){
             //手配3枚を隠す
             hidden_tehai_three();
 
-            naki_pais_img_1.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_2.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_3.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_1.style.transform = "rotate(-90deg)";
-            naki_pais_img_1.style.marginLeft = "10px";
-            naki_pais_img_1.style.marginRight = "10px";
-            naki_pais_div.appendChild(naki_pais_img_1);
-            naki_pais_div.appendChild(naki_pais_img_2);
-            naki_pais_div.appendChild(naki_pais_img_3);
+            //画像を生成
+            generatePongImg(naki_pais_div, pai_num, false);
 
             //鳴いた牌の種類と鳴きのタイプ（ポン）をリストに挿入
             naki_pais_list.push(pai_num);
@@ -3319,15 +3835,8 @@ for(let i = 0; i < table_pais.length; i++){
             //手配3枚を隠す
             hidden_tehai_three();
 
-            naki_pais_img_1.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_2.setAttribute('src', generate_pai_src(pai_num + 1));
-            naki_pais_img_3.setAttribute('src', generate_pai_src(pai_num + 2));
-            naki_pais_img_1.style.transform = "rotate(-90deg)";
-            naki_pais_img_1.style.marginLeft = "10px";
-            naki_pais_img_1.style.marginRight = "10px";
-            naki_pais_div.appendChild(naki_pais_img_1);
-            naki_pais_div.appendChild(naki_pais_img_2);
-            naki_pais_div.appendChild(naki_pais_img_3);
+            //画像を生成
+            generateChiImg(naki_pais_div, pai_num, false);
 
             //鳴いた牌の種類と鳴きのタイプ（チー）をリストに挿入
             naki_pais_list.push(pai_num);
@@ -3355,14 +3864,8 @@ for(let i = 0; i < table_pais.length; i++){
             //手配3枚を隠す
             hidden_tehai_three();
 
-            naki_pais_img_1.setAttribute('src', generate_pai_src(BACK));
-            naki_pais_img_2.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_3.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_4.setAttribute('src', generate_pai_src(BACK));
-            naki_pais_div.appendChild(naki_pais_img_1);
-            naki_pais_div.appendChild(naki_pais_img_2);
-            naki_pais_div.appendChild(naki_pais_img_3);
-            naki_pais_div.appendChild(naki_pais_img_4);
+            //画像を生成
+            generateAnkanImg(naki_pais_div, pai_num, false);
 
             //鳴いた牌の種類と鳴きのタイプ（暗槓）をリストに挿入
             naki_pais_list.push(pai_num);
@@ -3382,17 +3885,8 @@ for(let i = 0; i < table_pais.length; i++){
             //手配3枚を隠す
             hidden_tehai_three();
 
-            naki_pais_img_1.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_2.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_3.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_4.setAttribute('src', generate_pai_src(pai_num));
-            naki_pais_img_1.style.transform = "rotate(-90deg)";
-            naki_pais_img_1.style.marginLeft = "10px";
-            naki_pais_img_1.style.marginRight = "10px";
-            naki_pais_div.appendChild(naki_pais_img_1);
-            naki_pais_div.appendChild(naki_pais_img_2);
-            naki_pais_div.appendChild(naki_pais_img_3);
-            naki_pais_div.appendChild(naki_pais_img_4);
+            //画像を生成
+            generateMinkanImg(naki_pais_div, pai_num, false);
 
             //鳴いた牌の種類と鳴きのタイプ（明槓）をリストに挿入
             naki_pais_list.push(pai_num);
@@ -3617,10 +4111,12 @@ function modalAgariClose(){
 }
 //ツモボタンをクリックした時
 function btn_tsumo_click(){
+    modalAgariClose();
     calcAgari(Agari_Kata.tsumo);
 }
 //ロンボタンをクリックした時
 function btn_ron_click(){
+    modalAgariClose();
     calcAgari(Agari_Kata.ron);
 }
 //場風用ダイヤログが閉じたときの処理
@@ -3893,4 +4389,18 @@ function btn_minkan_click(){
         //モードを通常へ
         mode_current = Mode.normal;
     }
+}
+
+//入力画面に戻るボタン
+function btn_backtoinput_click(){
+    input_screen.style.display = "inline";
+    output_screen.style.display = "none";
+    //アガリの手牌を消去
+    deleteTehaiResult();
+    //点数を消去
+    deleteTensuu();
+    //翻数と役のリストを消去
+    deleteYakuList();
+    //符数のリストを消去
+    deleteFusuuList();
 }

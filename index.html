@@ -5,26 +5,46 @@
   <title>麻雀判定ツール</title>
  </head>
  <body>
-  <h1 id="state_text">手配を入力してください(残り14牌)</h1>
-  <div id="tehai"></div>
-  <div id="tehai_naki">
-    <div class="naki_pais" id="naki_1"></div>
-    <div class="naki_pais" id="naki_2"></div>
-    <div class="naki_pais" id="naki_3"></div>
-    <div class="naki_pais" id="naki_4"></div>
+  <div id="input_screen">
+    <h1 id="state_text">手配を入力してください(残り14牌)</h1>
+    <div id="tehai"></div>
+    <div id="tehai_naki">
+      <div class="naki_pais" id="naki_1"></div>
+      <div class="naki_pais" id="naki_2"></div>
+      <div class="naki_pais" id="naki_3"></div>
+      <div class="naki_pais" id="naki_4"></div>
+    </div>
+    <div class="btnlist" id="btnlist_situation">
+      <button type="button" class="btn_part" id="btn_bakaze" onclick="btn_bakaze_click()">場風(東)</button>
+      <button type="button" class="btn_part" id="btn_jikaze" onclick="btn_jikaze_click()">自風(東)</button>
+      <button type="button" class="btn_part" id="btn_reach" onclick="btn_reach_click()">立直</button>
+      <button type="button" class="btn_part" id="btn_delete" onclick="btn_delete_click()">全消去</button>
+    </div>
+    <div id="select"></div>
+    <div class="btnlist" id="btnlist_naki">
+    <button type="button" class="btn_part" id="btn_pong" onclick="btn_pong_click()">ポン</button>
+    <button type="button" class="btn_part" id="btn_chi" onclick="btn_chi_click()">チー</button>
+    <button type="button" class="btn_part" id="btn_ankan" onclick="btn_ankan_click()">暗槓</button>
+    <button type="button" class="btn_part" id="btn_minkan" onclick="btn_minkan_click()">明槓</button>
+    </div>
   </div>
-  <div class="btnlist" id="btnlist_situation">
-    <button type="button" class="btn_part" id="btn_bakaze" onclick="btn_bakaze_click()">場風(東)</button>
-    <button type="button" class="btn_part" id="btn_jikaze" onclick="btn_jikaze_click()">自風(東)</button>
-    <button type="button" class="btn_part" id="btn_reach" onclick="btn_reach_click()">立直</button>
-    <button type="button" class="btn_part" id="btn_delete" onclick="btn_delete_click()">全消去</button>
-  </div>
-  <div id="select"></div>
-  <div class="btnlist" id="btnlist_naki">
-   <button type="button" class="btn_part" id="btn_pong" onclick="btn_pong_click()">ポン</button>
-   <button type="button" class="btn_part" id="btn_chi" onclick="btn_chi_click()">チー</button>
-   <button type="button" class="btn_part" id="btn_ankan" onclick="btn_ankan_click()">暗槓</button>
-   <button type="button" class="btn_part" id="btn_minkan" onclick="btn_minkan_click()">明槓</button>
+  <div id="output_screen">
+    <div id="output_header">
+    <button type="button" id="btn_backtoinput" onclick="btn_backtoinput_click()">← 手配入力へ戻る</button>
+    <div id="output_screen_p">
+      <p id="hantei_result_p">判定結果</p>
+    </div>
+    </div>
+    <div id="tehai_result"></div>
+    <div id="tensuu_result"></div>
+    <div id="result_tables_div">
+      <div id="yaku_table_div">
+        <table id="yaku_table" class="result_tables"></table>
+      </div>
+      <div id="fusuu_table_div">
+        <table id="fusuu_table" class="result_tables"></table>
+      </div>
+    </div>
   </div>
   <div id="modal_noten" class="modal">
    <div class="modal_content">

@@ -1,6 +1,7 @@
 body{
     background-color: rgb(7, 121, 7);
 }
+
 #state_text{
     text-align: center;
 }
@@ -52,6 +53,77 @@ body{
 }
 .btn_part:hover{
     background-color: rgb(0, 130, 206);
+}
+
+#output_screen{
+    display: none;
+    animation-name: screenopen;
+    animation-duration: 1s;
+}
+@keyframes screenopen {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+#output_header{
+    display: table;
+    width: 63.5%;
+}
+#output_screen_p{
+    display: table-cell;
+    text-align: center;
+}
+#hantei_result_p{
+    font-size: 35px;
+    color: #e7e7e7;
+}
+#btn_backtoinput{
+    display: table-cell;
+    text-align: left;
+    width: 170px;
+    height: 50px;
+    margin:20px 0 20px 20px;
+    background-color: rgb(65, 65, 65);
+    border: 1px solid rgb(39, 39, 39);
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    color: #f0f0f0;
+    cursor:pointer;
+}
+#btn_backtoinput:hover{
+    background-color: rgb(53, 53, 53);
+}
+#tehai_result{
+    display: flex;
+    justify-content: center;
+}
+#tensuu_result{
+    background-color: #e7e7e7;
+    text-align: center;
+    font-size: 25px;
+}
+#result_tables_div{
+    display: flex;
+    justify-content: center;
+}
+#fusuu_table_div{
+    height: 700px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.result_tables{
+    border-collapse: collapse;
+    width: 500px;
+    font-size: 20px;
+}
+.result_tables td, th{
+    background-color: #e7e7e7;
+    border: 0.5px solid black;
+    text-align: center;
+}
+.result_tables td.width15{
+    width: 15%;
 }
 
 .modal{
