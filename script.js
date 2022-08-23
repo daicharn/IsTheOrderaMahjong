@@ -4404,3 +4404,8 @@ function btn_backtoinput_click(){
     //符数のリストを消去
     deleteFusuuList();
 }
+
+//テスト関数の追加
+function testFunc(){
+    
+}
