@@ -363,7 +363,7 @@ function tehai_sort(){
 
 //数値から牌の画像のパスを生成
 function generate_pai_src(num){
-    let pai_src = "images/";
+    let pai_src = "../images/";
     //バック
     if(num == BACK){
         pai_src += "back.png";
@@ -3740,7 +3740,7 @@ for(i = 0; i < TEHAI_NUMBER; i++){
     div_element.id = div_id_name;
     document.getElementById("tehai").appendChild(div_element);
     img_element.id = div_id_name + "_image";
-    img_element.src = "images/back.png";
+    img_element.src = generate_pai_src(BACK);
     document.getElementById(div_id_name).appendChild(img_element);
     p_element.className = "tehai_value";
     p_element.id = div_id_name + "_value";
