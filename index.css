@@ -108,7 +108,7 @@ body{
     justify-content: center;
 }
 #fusuu_table_div{
-    height: 700px;
+    height: 550px;
     overflow-x: hidden;
     overflow-y: auto;
 }

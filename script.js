@@ -1349,13 +1349,13 @@ function getMachiTypes(agari_list){
             }
         }
         //刻子
-        if(isCotsu(agari_list[i])){
+        else if(isCotsu(agari_list[i])){
             //アガリ牌が先頭の牌と一致すればシャンポン待ち
             if(agari_hai == haishu_first){
                 if(!(result_list.includes(Machi_Type.shanpon))){
                     result_list.push(Machi_Type.shanpon);
                 }
-            }       
+            }
         }
         //順子
         else{
