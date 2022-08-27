@@ -1,20 +1,9 @@
-//手配の数
-const TEHAI_NUMBER = 14;
-//牌の種類数
-const PAI_TYPE_NUM = 34;
 //同種牌の最大枚数
 const PAI_MAX = 4;
 
 //テーブルの縦と横の数
 const SELECT_TABLE_ROW = 4;
 const SELECT_TABLE_COLUMN = 9;
-
-//牌を数値として定義
-const BACK = 100;
-const MANZU = [1,2,3,4,5,6,7,8,9];
-const PINZU = [10,11,12,13,14,15,16,17,18];
-const SOUZU = [19,20,21,22,23,24,25,26,27];
-const JIHAI = [28,29,30,31,32,33,34];
 
 //モード
 const Mode = {
@@ -179,12 +168,12 @@ function set_tehai_img(i,src){
 //指定したテーブルの牌を非表示（裏返しにする）
 function hidden_table_pai(num){
     let table_pai = document.getElementById(num).firstChild;
-    table_pai.setAttribute('src', generate_pai_src(BACK));
+    table_pai.setAttribute('src', ScriptCore.generate_pai_src(BACK));
 }
 //指定したテーブルの牌を表示（表にする）
 function visible_table_pai(num){
     let table_pai = document.getElementById(num).firstChild;
-    table_pai.setAttribute('src', generate_pai_src(num));   
+    table_pai.setAttribute('src', ScriptCore.generate_pai_src(num));   
 }
 
 //テーブルの牌すべてを非表示
@@ -361,44 +350,6 @@ function tehai_sort(){
     }
 }
 
-//数値から牌の画像のパスを生成
-function generate_pai_src(num){
-    let pai_src = "../images/";
-    //バック
-    if(num == BACK){
-        pai_src += "back.png";
-        return pai_src;
-    }
-    //萬子
-    else if(num >= MANZU[0] && num <= MANZU[8]){
-        pai_src += "m_";
-    }
-    //筒子
-    else if(num >= PINZU[0] && num <= PINZU[8]){
-        pai_src += "p_";
-    }
-    //索子
-    else if(num >= SOUZU[0] && num <= SOUZU[8]){
-        pai_src += "s_";
-    }
-    //字牌
-    else if(num >= JIHAI[0] && num <= JIHAI[6]){
-        pai_src += "j_";
-    }
-    else{
-        return "";
-    }
-    //1～9の数値決め
-    if(num % SELECT_TABLE_COLUMN != 0){
-        pai_src += (num % SELECT_TABLE_COLUMN).toString() + ".png";
-    }
-    else{
-        pai_src += SELECT_TABLE_COLUMN.toString() + ".png";
-    }
-
-    return pai_src;
-}
-
 //牌の種類の数を調べる
 function count_pai_type(){
     let list_pais = [];
@@ -476,26 +427,9 @@ function count_zihai_type(){
     return list_pais.length;
 }
 
-//牌のカウント配列のベースを生成
-function createCountHaisBase(){
-    let array = new Array(4);
-    for(let i = 0; i < 4; i++){
-        let num = 9;
-        if(i == 3){
-            num = 7
-        }
-        array[i] = new Array(num);
-        for(let j = 0; j < num; j++){
-            array[i][j] = 0;
-        }
-    }
-
-    return array;
-}
-
 //手牌をカウントしたものを配列として生成
 function countHais(){
-    let haisCount = createCountHaisBase();
+    let haisCount = ScriptCore.createCountHaisBase();
     for(let i = 0; i < count_tehai_num() - naki_pais_list.length * 3; i++){
         let pai_num = Number(get_tehai_value(i + 1));
         haisCount[Math.floor((pai_num - 1) / 9)][(pai_num - 1) % 9]++;
@@ -506,7 +440,7 @@ function countHais(){
 
 //国士無双13面待ちの手牌を生成
 function generateKokushi13Tehai(){
-    let haisCount = createCountHaisBase();
+    let haisCount = ScriptCore.createCountHaisBase();
     for(let i = 0; i < haisCount.length; i++){
         for(let j = 0; j < haisCount[i].length; j++){
             //ヤオチュー牌であれば1枚追加する
@@ -519,38 +453,6 @@ function generateKokushi13Tehai(){
     return haisCount;
 }
 
-//通常の配列のコピーを生成する
-function copyArray(array){
-    let new_array = new Array(array.length);
-    for(let i = 0; i < array.length; i++){
-        new_array[i] = array[i].slice();
-    }
-    return new_array;
-}
-
-//手配用配列のコピーを生成する
-function copyCountArray(array){
-    let new_array = new Array(4);
-    for(let i = 0; i < 4; i++){
-        new_array[i] = array[i].slice();
-    }
-    return new_array;
-}
-
-//残っている牌を探して一覧をリストとして返す
-function searchNokoriHai(haisCount){
-    let result_list = [];
-    for(let i = 0; i < haisCount.length; i++){
-        for(let j = 0; j < haisCount[i].length; j++){
-            if(haisCount[i][j] > 0){
-                result_list.push(i * 9 + j + 1);
-            }
-        }
-    }
-
-    return result_list;
-}
-
 //再帰的にアガリ牌をブロックとして分割してブロックを返す
 function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, tehai_list){
     let result_list = [];
@@ -559,18 +461,18 @@ function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, t
         let count = hais_count[haishu][i % 9];
         //雀頭、対子の処理
         if(count >= 2){
-            let copied_hais = copyCountArray(hais_count);
+            let copied_hais = ScriptCore.copyArray(hais_count);
             copied_hais[haishu][i % 9] -= 2;
-            let tehai_list_new = copyArray(tehai_list);
+            let tehai_list_new = ScriptCore.copyArray(tehai_list);
             tehai_list_new.push([i + 1, i + 1]);
             //再帰呼び出し
             result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count, toitsu_count + 1, tehai_list_new));
         }
         //刻子の処理
         if(count >= 3){
-            let copied_hais = copyCountArray(hais_count);
+            let copied_hais = ScriptCore.copyArray(hais_count);
             copied_hais[haishu][i % 9] -= 3;
-            let tehai_list_new = copyArray(tehai_list);
+            let tehai_list_new = ScriptCore.copyArray(tehai_list);
             tehai_list_new.push([i + 1, i + 1, i + 1]);
             //再帰呼び出し
             result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
@@ -583,11 +485,11 @@ function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, t
 
         //順子（面子）の処理
         if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
-            let copied_hais = copyCountArray(hais_count);
+            let copied_hais = ScriptCore.copyArray(hais_count);
             copied_hais[haishu][i % 9]--;
             copied_hais[haishu][i % 9 + 1]--;
             copied_hais[haishu][i % 9 + 2]--;
-            let tehai_list_new = copyArray(tehai_list);
+            let tehai_list_new = ScriptCore.copyArray(tehai_list);
             tehai_list_new.push([i + 1, i + 2, i + 3]);
             //再帰呼び出し
             result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
@@ -596,124 +498,6 @@ function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, t
     //分割完了時、4面子1雀頭または対子が7つまたは国士無双であればリストに追加
     if((mentsu_count + naki_pais_list.length == 4 && toitsu_count == 1) || toitsu_count == 7){
         result_list.push(tehai_list.sort());
-    }
-
-    return result_list;
-}
-
-//再帰的に手牌をブロックとして分割（聴牌判定時のみ使用）
-function createTenpaiHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count){
-    let result_list = [];
-    for(let i = 0; i < PAI_TYPE_NUM; i++){
-        let haishu = Math.floor(i / 9);
-        let count = hais_count[haishu][i % 9];
-        //雀頭、対子の処理
-        if(count >= 2){
-            let copied_hais = copyCountArray(hais_count);
-            //面子が3枚で対子が2枚のシャンポン待ちの待ち牌をリストに追加
-            if(mentsu_count + naki_pais_list.length >= 3 && toitsu_count >= 1){
-                let nokoriHais = searchNokoriHai(copied_hais);
-                for(let j = 0; j < nokoriHais.length; j++){
-                    if(!machihai_list.includes(nokoriHais[j])){
-                        machihai_list.push(nokoriHais[j]);
-                    }
-                }
-            }
-            copied_hais[haishu][i % 9] -= 2;
-            //再帰呼び出し
-            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1));
-        }
-        //刻子の処理
-        if(count >= 3){
-            let copied_hais = copyCountArray(hais_count);
-            copied_hais[haishu][i % 9] -= 3;
-            //面子が4枚で単騎待ちの時の待ち牌をリストに追加
-            if(mentsu_count + naki_pais_list.length >= 3){
-                let nokoriHais = searchNokoriHai(copied_hais);
-                for(let j = 0; j < nokoriHais.length; j++){
-                    if(!machihai_list.includes(nokoriHais[j])){
-                        machihai_list.push(nokoriHais[j]);
-                    }
-                }
-            }
-            //再帰呼び出し
-            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count))
-        }
-        //字牌なら対子、刻子の処理のみで終了させる
-        if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
-            continue;
-        }
-        //順子（面子）の処理
-        if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
-            let copied_hais = copyCountArray(hais_count);
-            copied_hais[haishu][i % 9]--;
-            copied_hais[haishu][i % 9 + 1]--;
-            copied_hais[haishu][i % 9 + 2]--;
-            //面子が4枚で単騎待ちの時の待ち牌をリストに追加
-            if(mentsu_count + naki_pais_list.length >= 3){
-                let nokoriHais = searchNokoriHai(copied_hais);
-                for(let j = 0; j < nokoriHais.length; j++){
-                    if(!machihai_list.includes(nokoriHais[j])){
-                        machihai_list.push(nokoriHais[j]);
-                    }
-                }
-            }
-            //再帰呼び出し
-            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count));
-        }
-        //カンチャン（塔子）の処理
-        if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
-            let copied_hais = copyCountArray(hais_count);
-            copied_hais[haishu][i % 9]--;
-            copied_hais[haishu][i % 9 + 2]--;
-            //面子が4枚でカンチャン待ちの時の待ち牌をリストに追加
-            if(mentsu_count + naki_pais_list.length >= 3 && toitsu_count >= 1){
-                let kanchanHai = (haishu * 9) + (i % 9 + 1);
-                if(!machihai_list.includes(kanchanHai + 1)){
-                    machihai_list.push(kanchanHai + 1);
-                }
-            }
-            //再帰呼び出し
-            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
-        }
-        //ペンチャン、両面の処理
-        if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1){
-            let copied_hais = copyCountArray(hais_count);
-            copied_hais[haishu][i % 9]--;
-            copied_hais[haishu][i % 9 + 1]--;
-            //面子が4枚でペンチャンまたは両面待ちの時の待ち牌をリストに追加
-            if(mentsu_count + naki_pais_list.length >= 3 && toitsu_count >= 1){
-                let leftHai = (haishu * 9) + (i % 9);
-                let rightHai = (haishu * 9) + (i % 9 + 1);
-                //両面待ちの場合
-                if(leftHai % 9 != 0 && rightHai % 9 != 8){
-                    if(!machihai_list.includes(leftHai)){
-                        machihai_list.push(leftHai);
-                    }
-                    if(!machihai_list.includes(rightHai + 2)){
-                        machihai_list.push(rightHai + 2);
-                    }
-                }
-                //1,2のペンチャンの場合
-                else if(leftHai % 9 == 0){
-                    if(!machihai_list.includes(rightHai + 2)){
-                        machihai_list.push(rightHai + 2);
-                    }                    
-                }
-                //8,9のペンチャンの場合
-                else if(rightHai % 9 == 8){
-                    if(!machihai_list.includes(leftHai)){
-                        machihai_list.push(leftHai);
-                    }                    
-                }
-            }
-            //再帰呼び出し
-            result_list = result_list.concat(createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count));
-        }           
-    }
-    //分解が終了したら結果を記憶する
-    if(mentsu_count + taatsu_count + toitsu_count > 0){
-        result_list.push([mentsu_count, taatsu_count, toitsu_count]);
     }
 
     return result_list;
@@ -738,7 +522,7 @@ function test_getAgariBlockResult(){
 function calcIppanteShanten(haisCount){
     //分解結果を記憶する変数
     let result_list = new Array(1);
-    result_list = createTenpaiHaiBlocksRecursive(haisCount, 0, 0, 0);
+    result_list = ScriptCore.createTenpaiHaiBlocksRecursive(haisCount, 0, 0, 0, naki_pais_list.length, machihai_list);
     result_list = [...new Set(result_list.map(JSON.stringify))].map(JSON.parse);
 
     //最小のシャンテン数を探す
@@ -786,9 +570,9 @@ function calcIppanteShanten(haisCount){
     }
 
     //裸単騎の場合は特殊な処理を行う
-    if(result_list.length == 0 && searchNokoriHai(haisCount).length == 1){
+    if(result_list.length == 0 && ScriptCore.searchNokoriHai(haisCount).length == 1){
         min_shanten = 0;
-        machihai_list.push(searchNokoriHai(haisCount)[0]);
+        machihai_list.push(ScriptCore.searchNokoriHai(haisCount)[0]);
     }
 
     //最小のシャンテン数を返す
@@ -799,7 +583,7 @@ function calcIppanteShanten(haisCount){
 function calcKokushiShanten(haisCount){
     let has_janto = false;
     let yaochu_count = 0;
-    let copied_hais = copyCountArray(haisCount);
+    let copied_hais = ScriptCore.copyArray(haisCount);
 
     for(let i = 0; i < copied_hais.length; i++){
         for(let j = 0; j < copied_hais[i].length; j++){
@@ -867,7 +651,7 @@ function calcKokushiShanten(haisCount){
 function calcChiitoiShanten(haisCount){
     let toitsu_count = 0;
     let haishu_count = 0;
-    let copied_hais = copyCountArray(haisCount);
+    let copied_hais = ScriptCore.copyArray(haisCount);
 
     for(let i = 0; i < copied_hais.length; i++){
         for(let j = 0; j < copied_hais[i].length; j++){
@@ -892,7 +676,7 @@ function calcChiitoiShanten(haisCount){
 
     //聴牌であれば待ち牌を求めてリストに挿入
     if(shanten == 0){
-        let machihai = searchNokoriHai(copied_hais)[0];
+        let machihai = ScriptCore.searchNokoriHai(copied_hais)[0];
         if(!machihai_list.includes(machihai)){
             machihai_list.push(machihai);
         }
@@ -998,7 +782,7 @@ function tehai_pai_index(num){
 
 //指定した牌を手牌にセットする一連の処理
 function tehai_set(num){
-    set_tehai_img(tehai_current + 1, generate_pai_src(num));
+    set_tehai_img(tehai_current + 1, ScriptCore.generate_pai_src(num));
     set_tehai_value(tehai_current + 1, num);
     tehai_current++;
     tehai_sort();
@@ -3320,7 +3104,7 @@ function displayAgarihai(agari_kata){
     div_element.style.backgroundColor = "red";
     img_element.style.width = "40px";
     img_element.style.opacity = "0.8";
-    img_element.src = generate_pai_src(agari_hai);
+    img_element.src = ScriptCore.generate_pai_src(agari_hai);
     div_element.appendChild(img_element);
     document.getElementById('tehai_result').appendChild(div_element);
 }
@@ -3343,7 +3127,7 @@ function displayTehaiResult(agari_list){
             for(let j = 0; j < agari_list[i].length; j++){
                 let img_element = document.createElement('img');
                 img_element.style.width = "40px";
-                img_element.src = generate_pai_src(agari_list[i][j]);
+                img_element.src = ScriptCore.generate_pai_src(agari_list[i][j]);
                 div_element.appendChild(img_element);
             }
         }
@@ -3535,7 +3319,7 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
             cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
             for(let j = 0; j < 2; j++){
                 let hai_image = document.createElement('img');
-                hai_image.src = generate_pai_src(fusuu_summary_list[i][2]);
+                hai_image.src = ScriptCore.generate_pai_src(fusuu_summary_list[i][2]);
                 hai_image.style.width = "40px";
                 cell_summary_img.appendChild(hai_image);
             }
@@ -3546,9 +3330,9 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
             cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
             let hai_image_1 = document.createElement('img');
             let hai_image_2 = document.createElement('img');
-            hai_image_1.src = generate_pai_src(agari_hai);
+            hai_image_1.src = ScriptCore.generate_pai_src(agari_hai);
             hai_image_1.style.width = "40px";
-            hai_image_2.src = generate_pai_src(BACK);
+            hai_image_2.src = ScriptCore.generate_pai_src(BACK);
             hai_image_2.style.width = "40px";
             cell_summary_img.appendChild(hai_image_1);
             cell_summary_img.appendChild(hai_image_2);
@@ -3561,10 +3345,10 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
                 let hai_image = document.createElement('img');
                 //真ん中を裏返しにする
                 if(j != 1){
-                    hai_image.src = generate_pai_src(agari_hai - 1 + j);
+                    hai_image.src = ScriptCore.generate_pai_src(agari_hai - 1 + j);
                 }
                 else{
-                    hai_image.src = generate_pai_src(BACK);
+                    hai_image.src = ScriptCore.generate_pai_src(BACK);
                 }
                 hai_image.style.width = "40px";
                 cell_summary_img.appendChild(hai_image);
@@ -3579,19 +3363,19 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
                 //アガリ牌が3であれば右を隠す
                 if(agari_hai % 9 == 3){
                     if(j == 2){
-                        hai_image.src = generate_pai_src(BACK);
+                        hai_image.src = ScriptCore.generate_pai_src(BACK);
                     }
                     else{
-                        hai_image.src = generate_pai_src(agari_hai - 2 + j);
+                        hai_image.src = ScriptCore.generate_pai_src(agari_hai - 2 + j);
                     }
                 }
                 //アガリ牌が7であれば左を隠す
                 else if(agari_hai % 9 == 7){
                     if(j == 0){
-                        hai_image.src = generate_pai_src(BACK);
+                        hai_image.src = ScriptCore.generate_pai_src(BACK);
                     }
                     else{
-                        hai_image.src = generate_pai_src(agari_hai + j);
+                        hai_image.src = ScriptCore.generate_pai_src(agari_hai + j);
                     }
                 }
                 hai_image.style.width = "40px";
@@ -3607,7 +3391,7 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
             cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
             for(let j = 0; j < 3; j++){
                 let hai_image = document.createElement('img');
-                hai_image.src = generate_pai_src(fusuu_summary_list[i][2]);
+                hai_image.src = ScriptCore.generate_pai_src(fusuu_summary_list[i][2]);
                 hai_image.style.width = "40px";
                 cell_summary_img.appendChild(hai_image);
             }
@@ -3648,7 +3432,7 @@ function deleteFusuuList(){
 function generatePongImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 3; i++){
         let naki_pais_img = document.createElement('img');
-        naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+        naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
         if(size_min_flg){
             naki_pais_img.style.width = "40px";
         }
@@ -3671,7 +3455,7 @@ function generatePongImg(naki_pais_div, pai_num, size_min_flg){
 function generateChiImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 3; i++){
         let naki_pais_img = document.createElement('img');
-        naki_pais_img.setAttribute('src', generate_pai_src(pai_num + i));
+        naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num + i));
         if(size_min_flg){
             naki_pais_img.style.width = "40px";
         }
@@ -3698,10 +3482,10 @@ function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
             naki_pais_img.style.width = "40px";
         }
         if(i == 0 || i == 3){
-            naki_pais_img.setAttribute('src', generate_pai_src(BACK));
+            naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(BACK));
         }
         else{
-            naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+            naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
         }
         naki_pais_div.appendChild(naki_pais_img);
     }
@@ -3711,7 +3495,7 @@ function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
 function generateMinkanImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 4; i++){
         let naki_pais_img = document.createElement('img');
-        naki_pais_img.setAttribute('src', generate_pai_src(pai_num));
+        naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
         if(size_min_flg){
             naki_pais_img.style.width = "40px";
         }
@@ -3740,7 +3524,7 @@ for(i = 0; i < TEHAI_NUMBER; i++){
     div_element.id = div_id_name;
     document.getElementById("tehai").appendChild(div_element);
     img_element.id = div_id_name + "_image";
-    img_element.src = generate_pai_src(BACK);
+    img_element.src = ScriptCore.generate_pai_src(BACK);
     document.getElementById(div_id_name).appendChild(img_element);
     p_element.className = "tehai_value";
     p_element.id = div_id_name + "_value";
@@ -3775,13 +3559,13 @@ for (let i = 0; i < SELECT_TABLE_ROW; i++){
             if(i != 3){
                 let cell_id = (i * SELECT_TABLE_COLUMN) + (j + 1);
                 cell.id = cell_id
-                cellimg.src = generate_pai_src(cell_id);
+                cellimg.src = ScriptCore.generate_pai_src(cell_id);
             }
             //字牌のID
             else{
                 let cell_id = (i * SELECT_TABLE_COLUMN) + j;
                 cell.id = cell_id
-                cellimg.src = generate_pai_src(cell_id);
+                cellimg.src = ScriptCore.generate_pai_src(cell_id);
             }
             cell.className = "table_pai";
             cell.appendChild(cellimg);
@@ -3958,7 +3742,7 @@ for(let i = 0; i < tehai_pais.length; i++){
                     max_pais_list.splice(max_pai_index, 1);
                 }
                 set_tehai_value(i + 1, BACK);
-                set_tehai_img(i + 1, generate_pai_src(BACK));
+                set_tehai_img(i + 1, ScriptCore.generate_pai_src(BACK));
                 tehai_sort();
                 tehai_current--;
             }
@@ -4227,7 +4011,7 @@ function btn_delete_click(){
     //手牌のリセット
     for(let i = 0; i < TEHAI_NUMBER; i++){
         //手牌の画像と値をリセット
-        set_tehai_img(i + 1, generate_pai_src(BACK));
+        set_tehai_img(i + 1, ScriptCore.generate_pai_src(BACK));
         set_tehai_value(i + 1, BACK);
         //非表示にした牌を表示
         get_tehai_obj(i + 1).style.visibility = "visible";
