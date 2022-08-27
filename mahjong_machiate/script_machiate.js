@@ -16,6 +16,11 @@ generateTehai();
 generateMachiList();
 displayTehai();
 
+//test
+function test(){
+    
+}
+
 //手牌を画面に表示
 function displayTehai(){
     for(i = 0; i < tehai_count[0].length; i++){
