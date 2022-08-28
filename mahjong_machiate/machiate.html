@@ -7,6 +7,22 @@
  <body>
   <h1 id="state_text">待ち牌を選択してください</h1>
   <div id="tehai"></div>
+  <div id="select_div"></div>
+  <div id="btnlist">
+   <div class="btn_part" id="btn_clear" onclick="btn_clear_click()"><p class="btn_label">クリア(Esc)</p></div>
+   <div class="btn_part" id="btn_answer" onclick="btn_answer_click()"><p class="btn_label">解答(Space)</p></div>
+   <div class="btn_part" id="btn_next" onclick="btn_next_click()"><p class="btn_label">次の問題(Enter)</p></div>
+  </div>
+  <div id="modal_answer" class="modal">
+    <div class="modal_content">
+     <div class="modal_header">
+       <h1>解答</h1>
+       <span id="modal_answer_close" class="modal_close">×</span>
+     </div>
+     <div id="modal_answer_body" class="modal_body">
+     </div>
+    </div>
+   </div>
  </body>
  <script src="../script_core.js"></script>
  <script src="script_machiate.js"></script>
