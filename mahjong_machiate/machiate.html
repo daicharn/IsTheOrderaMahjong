@@ -8,10 +8,14 @@
   <h1 id="state_text">待ち牌を選択してください</h1>
   <div id="tehai"></div>
   <div id="select_div"></div>
-  <div id="btnlist">
+  <div class="btnlist">
    <div class="btn_part" id="btn_clear" onclick="btn_clear_click()"><p class="btn_label">クリア(Esc)</p></div>
    <div class="btn_part" id="btn_answer" onclick="btn_answer_click()"><p class="btn_label">解答(Space)</p></div>
    <div class="btn_part" id="btn_next" onclick="btn_next_click()"><p class="btn_label">次の問題(Enter)</p></div>
+  </div>
+  <div class="btnlist">
+    <div class="btn_part" id="btn_haishu" onclick="btn_haishu_click()"><p class="btn_label">牌種の変更</p></div>
+    <div class="btn_part" id="btn_setting" onclick=""><p class="btn_label">詳細設定</p></div>
   </div>
   <div id="modal_answer" class="modal">
     <div class="modal_content">
@@ -22,7 +26,30 @@
      <div id="modal_answer_body" class="modal_body">
      </div>
     </div>
-   </div>
+  </div>
+  <div id="modal_haishu" class="modal">
+    <div class="modal_content">
+     <div class="modal_header">
+       <h1>牌種の変更</h1>
+       <span id="modal_haishu_close" class="modal_close">×</span>
+     </div>
+     <div id="modal_haishu_body" class="modal_body">
+      <p>牌種を選択してください</p>
+      <div id="haishu_radios">
+       <input type="radio" name="haishu_select" class="haishu_radio" id="haishu_radio_manzu">
+       <label for="haishu_radio_manzu"><img class="haishu_radio_image" src="../images/m_1.png"></label>
+       <input type="radio" name="haishu_select" class="haishu_radio" id="haishu_radio_pinzu">
+       <label for="haishu_radio_pinzu"><img class="haishu_radio_image" src="../images/p_1.png"></label>
+       <input type="radio" name="haishu_select" class="haishu_radio" id="haishu_radio_souzu">
+       <label for="haishu_radio_souzu"><img class="haishu_radio_image" src="../images/s_1.png"></label>
+      </div>
+      <div class="btnlist">
+       <div class="btn_part" id="btn_haishu_cancel" onclick="btn_haishu_cancel_click()"><p class="btn_label">キャンセル</p></div>
+       <div class="btn_part" id="btn_haishu_enter" onclick="btn_haishu_enter_click()"><p class="btn_label">決定</p></div>
+      </div>
+     </div>
+    </div>
+  </div>
  </body>
  <script src="../script_core.js"></script>
  <script src="script_machiate.js"></script>

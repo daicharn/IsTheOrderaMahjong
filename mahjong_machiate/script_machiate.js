@@ -29,9 +29,13 @@ let maxhai_list = generateMaxHaiList(tehai_count);
 //テーブルの選択フラグ
 let select_flgs = new Array(9).fill(false);
 
+//表示する牌種(初期値は萬子)
+let display_haishu = Hai_Type.manzu;
+
 //ダイヤログ用のオブジェクト
 let modal_answer = document.getElementById('modal_answer');
 let modal_answer_body = document.getElementById('modal_answer_body');
+let modal_haishu = document.getElementById('modal_haishu');
 
 //待ち牌選択用テーブルを生成
 let tbl = document.createElement('table');
@@ -41,7 +45,9 @@ for(let i = 0; i < 3; i++){
     let row = document.createElement('tr');
     for(let j = 0; j < 3; j++){
         let cell = document.createElement('td');
+        let cellimg = document.createElement('img');
         cell.className = "select_cell";
+        cell.appendChild(cellimg);
         row.appendChild(cell);
     }
     tblBody.appendChild(row);
@@ -76,20 +82,20 @@ for(let i = 0; i < select_cells.length; i++){
 }
 
 //手牌を画面に表示
-displayTehai();
+displayTehai(display_haishu);
 //待ち牌洗濯用のテーブルに画像を挿入(初期状態は萬子)
-insertImgSelectTable(Hai_Type.manzu);
+insertImgSelectTable(display_haishu);
 //4枚使用されている牌のセルの画像を薄くする
 thinMaxHaiCell();
 
 //手牌を画面に表示
-function displayTehai(){
+function displayTehai(hai_type){
     for(i = 0; i < tehai_count[0].length; i++){
         for(let j = 0; j < tehai_count[0][i]; j++){
             let div_element = document.createElement('div');
             let img_element = document.createElement('img');
             div_element.className = "tehai_part";
-            img_element.src = ScriptCore.generate_pai_src(i + 1);
+            img_element.src = ScriptCore.generate_pai_src(hai_type * 9 + i + 1);
             div_element.appendChild(img_element);
             document.getElementById('tehai').appendChild(div_element);
         }
@@ -106,9 +112,8 @@ function deleteTehai(){
 //待ち牌選択用のテーブルに画像を挿入
 function insertImgSelectTable(hai_type){
     for(let i = 0; i < select_cells.length; i++){
-        let cellimg = document.createElement('img');
+        let cellimg = select_cells[i].firstChild;
         cellimg.src = ScriptCore.generate_pai_src(hai_type * 9 + i + 1);
-        select_cells[i].appendChild(cellimg);
     }
 }
 
@@ -415,7 +420,7 @@ function btn_answer_click(){
     for(let i = 0; i < machihai_list.length; i++){
         let div_element = document.createElement('div');
         let img_element = document.createElement('img');
-        img_element.src = ScriptCore.generate_pai_src(machihai_list[i]);
+        img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + machihai_list[i]);
         div_element.appendChild(img_element);
         true_answer_div.appendChild(div_element);
     }
@@ -430,7 +435,7 @@ function btn_answer_click(){
         if(select_flgs[i]){
             let div_element = document.createElement('div');
             let img_element = document.createElement('img');
-            img_element.src = ScriptCore.generate_pai_src(i + 1);
+            img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + i + 1);
             div_element.appendChild(img_element);
             user_answer_div.appendChild(div_element);
         }
@@ -463,21 +468,65 @@ function btn_next_click(){
     maxhai_list = generateMaxHaiList(tehai_count);
 
     //手牌を画面に表示
-    displayTehai();
+    displayTehai(display_haishu);
     //4枚使用されている牌のセルの画像を薄くする
     thinMaxHaiCell();
+}
+//牌種の変更ボタンが押された時
+function btn_haishu_click(){
+    let haishu_radios = document.getElementsByClassName('haishu_radio');
+    haishu_radios[display_haishu].checked = true;
+    modal_haishu.style.display = "block";
+}
+//牌種の変更時、キャンセルボタンが押された時
+function btn_haishu_cancel_click(){
+    //モーダルを閉じる
+    modalHaishuClose();
+}
+//牌種の変更時、決定ボタンが押された時
+function btn_haishu_enter_click(){
+    //ラジオボタンで選択された牌種を取得
+    let new_haishu = 0;
+    let haishu_radios = document.getElementsByClassName('haishu_radio');
+    for(let i = 0; i < haishu_radios.length; i++){
+        if(haishu_radios[i].checked){
+            new_haishu = i;
+        }
+    }
+    //モーダルを閉じる
+    modalHaishuClose();
+    
+    //現在の牌種と選択された牌種が異なれば変更を行う
+    if(display_haishu != new_haishu){
+        //手牌の変更
+        deleteTehai();
+        displayTehai(new_haishu);
+        //選択用テーブルの変更
+        insertImgSelectTable(new_haishu);
+        //牌種の変更
+        display_haishu = new_haishu;
+    }
 }
 
 //イベント登録（解答用ダイヤログの閉じるボタン）
 let modal_answer_close = document.getElementById('modal_answer_close');
-modal_answer_close.addEventListener("click", (event) =>{
+modal_answer_close.addEventListener("click", () =>{
     modalAnswerClose();
+});
+//イベント登録（牌種選択用ダイヤログの閉じるボタン）
+let modal_haishu_close = document.getElementById('modal_haishu_close');
+modal_haishu_close.addEventListener("click", () =>{
+    modalHaishuClose();
 });
 //モーダルコンテンツ以外がクリックされた時のイベントをそれぞれのダイヤログに登録
 addEventListener("click", (event) =>{
-    //ノーテン時
+    //解答時
     if(event.target == modal_answer){
         modalAnswerClose();
+    }
+    //牌種洗濯時
+    else if(event.target == modal_haishu){
+        modalHaishuClose();
     }
 });
 //解答用ダイヤログが閉じたときの処理
@@ -486,6 +535,10 @@ function modalAnswerClose(){
         modal_answer_body.removeChild(modal_answer_body.firstChild);
     }
     modal_answer.style.display = "none";
+}
+//牌種選択用ダイヤログが閉じたときの処理
+function modalHaishuClose(){
+    modal_haishu.style.display = "none";
 }
 
 //キーボードを押したときのイベント
@@ -502,6 +555,9 @@ document.onkeydown = (event) =>{
         //モーダルが開いているときはそれを閉じる
         if(modal_answer.style.display == "block"){
             modalAnswerClose();
+        }
+        else if(modal_haishu.style.display == "block"){
+            modalHaishuClose();
         }
         //通常時は選択した牌をクリア
         else{

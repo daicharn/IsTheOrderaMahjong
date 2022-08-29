@@ -18,7 +18,7 @@ body{
     cursor: pointer;
 }
 
-#btnlist{
+.btnlist{
     display: flex;
     justify-content: center;
 }
@@ -83,4 +83,19 @@ body{
 .modal_body{
     padding: 10px 20px;
     color: black;
+}
+
+#haishu_radios{
+    text-align: center;
+    margin: 20px 0;
+}
+.haishu_radio{
+    display: none;
+}
+.haishu_radio:checked + label img{
+    background-color: orange;
+}
+.haishu_radio_image{
+    margin: 3px;
+    padding: 8px;
 }
