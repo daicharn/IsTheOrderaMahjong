@@ -50,9 +50,16 @@ body{
     font-weight: bold;
     transition: background-color 0.3s;
     cursor:pointer;
+    display: table;
+    user-select: none;
 }
 .btn_part:hover{
     background-color: rgb(0, 130, 206);
+}
+.btn_label{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
 }
 
 #output_screen{

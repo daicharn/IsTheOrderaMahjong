@@ -837,25 +837,25 @@ function changeBakaze(bakaze_new){
         //東
         case Kaze_Type.ton:
             bakaze = bakaze_new;
-            btn_bakaze.innerText = "場風(東)"
+            btn_bakaze.firstChild.innerText = "場風(東)"
             btn_ton.style.display = "none";
             break;
         //南
         case Kaze_Type.nan:
             bakaze = bakaze_new;
-            btn_bakaze.innerText = "場風(南)"
+            btn_bakaze.firstChild.innerText = "場風(南)"
             btn_nan.style.display = "none";
             break;
         //西
         case Kaze_Type.sha:
             bakaze = bakaze_new;
-            btn_bakaze.innerText = "場風(西)"
+            btn_bakaze.firstChild.innerText = "場風(西)"
             btn_sha.style.display = "none";
             break;
         //北
         case Kaze_Type.pei:
             bakaze = bakaze_new;
-            btn_bakaze.innerText = "場風(北)"
+            btn_bakaze.firstChild.innerText = "場風(北)"
             btn_pei.style.display = "none";
             break;
     }
@@ -895,25 +895,25 @@ function changeJikaze(jikaze_new){
         //東
         case Kaze_Type.ton:
             jikaze = jikaze_new;
-            btn_jikaze.innerText = "自風(東)"
+            btn_jikaze.firstChild.innerText = "自風(東)"
             btn_ton.style.display = "none";
             break;
         //南
         case Kaze_Type.nan:
             jikaze = jikaze_new;
-            btn_jikaze.innerText = "自風(南)"
+            btn_jikaze.firstChild.innerText = "自風(南)"
             btn_nan.style.display = "none";
             break;
         //西
         case Kaze_Type.sha:
             jikaze = jikaze_new;
-            btn_jikaze.innerText = "自風(西)"
+            btn_jikaze.firstChild.innerText = "自風(西)"
             btn_sha.style.display = "none";
             break;
         //北
         case Kaze_Type.pei:
             jikaze = jikaze_new;
-            btn_jikaze.innerText = "自風(北)"
+            btn_jikaze.firstChild.innerText = "自風(北)"
             btn_pei.style.display = "none";
             break;
     }
@@ -4033,7 +4033,7 @@ function btn_pong_click(){
         hidden_table_naki(Naki_Type.pong);
         
         //ポン以外を隠す
-        btn_pong.innerText = "解除";
+        btn_pong.firstChild.innerText = "解除";
         btn_chi.style.cursor = "default";
         btn_ankan.style.cursor = "default";
         btn_minkan.style.cursor = "default";
@@ -4050,7 +4050,7 @@ function btn_pong_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_pong.innerText = "ポン";
+        btn_pong.firstChild.innerText = "ポン";
         btn_chi.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
@@ -4070,7 +4070,7 @@ function btn_chi_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.chi);
         //チー以外を隠す
-        btn_chi.innerText = "解除";
+        btn_chi.firstChild.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_ankan.style.cursor = "default";
         btn_minkan.style.cursor = "default";
@@ -4087,7 +4087,7 @@ function btn_chi_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_chi.innerText = "チー";
+        btn_chi.firstChild.innerText = "チー";
         btn_pong.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
@@ -4107,7 +4107,7 @@ function btn_ankan_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.ankan);
         //暗槓以外を隠す
-        btn_ankan.innerText = "解除";
+        btn_ankan.firstChild.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_chi.style.cursor = "default";
         btn_minkan.style.cursor = "default";
@@ -4124,7 +4124,7 @@ function btn_ankan_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();
         //ボタンを元に戻す
-        btn_ankan.innerText = "暗槓";
+        btn_ankan.firstChild.innerText = "暗槓";
         btn_pong.style.cursor = "pointer";
         btn_chi.style.cursor = "pointer";
         btn_minkan.style.cursor = "pointer";
@@ -4144,7 +4144,7 @@ function btn_minkan_click(){
         //鳴けない牌を非表示にする
         hidden_table_naki(Naki_Type.minkan);
         //明槓以外を隠す
-        btn_minkan.innerText = "解除";
+        btn_minkan.firstChild.innerText = "解除";
         btn_pong.style.cursor = "default";
         btn_chi.style.cursor = "default";
         btn_ankan.style.cursor = "default";
@@ -4161,7 +4161,7 @@ function btn_minkan_click(){
         //非表示にしたテーブル上の牌を元に戻す
         visible_table_hais();        
         //ボタンを元に戻す
-        btn_minkan.innerText = "明槓";
+        btn_minkan.firstChild.innerText = "明槓";
         btn_pong.style.cursor = "pointer";
         btn_chi.style.cursor = "pointer";
         btn_ankan.style.cursor = "pointer";
