@@ -14,6 +14,7 @@
    <div class="btn_part" id="btn_next" onclick="btn_next_click()"><p class="btn_label">次の問題(Enter)</p></div>
   </div>
   <div class="btnlist">
+    <div class="btn_part" id="btn_marker" onclick="btn_marker_click()"><p class="btn_label">マーカー</p></div>
     <div class="btn_part" id="btn_haishu" onclick="btn_haishu_click()"><p class="btn_label">牌種の変更</p></div>
     <div class="btn_part" id="btn_setting" onclick=""><p class="btn_label">詳細設定</p></div>
   </div>
@@ -46,6 +47,24 @@
       <div class="btnlist">
        <div class="btn_part" id="btn_haishu_cancel" onclick="btn_haishu_cancel_click()"><p class="btn_label">キャンセル</p></div>
        <div class="btn_part" id="btn_haishu_enter" onclick="btn_haishu_enter_click()"><p class="btn_label">決定</p></div>
+      </div>
+     </div>
+    </div>
+  </div>
+  <div id="modal_marker" class="modal">
+    <div class="modal_content">
+     <div class="modal_header">
+       <h1>マーカー</h1>
+       <span id="modal_marker_close" class="modal_close">×</span>
+     </div>
+     <div id="modal_marker_body" class="modal_body">
+      <p>マーカーを有効化し手牌をクリックすることで色を付けられます</p>
+      <p>再度クリックすることでマーカーを消去することができます</p>
+      <div class="marker_parts">
+       <label for="checkbox_marker">マーカーの有効化</label><input type="checkbox" id="checkbox_marker">
+      </div>
+      <div class="marker_parts">
+       <label for="color_marker">色の選択</label><input type="color" id="color_marker">
       </div>
      </div>
     </div>

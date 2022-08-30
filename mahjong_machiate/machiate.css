@@ -21,6 +21,7 @@ body{
 .btnlist{
     display: flex;
     justify-content: center;
+    margin: 10px 0;
 }
 .btn_part{
     width: 200px;
@@ -58,7 +59,7 @@ body{
 }
 .modal_content{
     background-color: #f4f4f4;
-    margin: 20% auto;
+    margin: 15% auto;
     width: 50%;
     box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
     animation-name: modalopen;
@@ -98,4 +99,15 @@ body{
 .haishu_radio_image{
     margin: 3px;
     padding: 8px;
+}
+
+.marker_parts{
+    margin: 10px 0;
+}
+#checkbox_marker{
+    transform: scale(1.5);
+    margin-left: 10px;
+}
+#color_marker{
+    margin-left: 10px;
 }
