@@ -71,6 +71,13 @@ const Fusuu_Pattern = {
     yakuhai_janto : 11
 }
 
+//立直のタイプ
+const Reach_Type = {
+    none : 0,
+    reach : 1,
+    doublereach : 2
+}
+
 //現在の手配の数
 let tehai_current = 0;
 
@@ -110,8 +117,8 @@ let bakaze = Kaze_Type.ton;
 //自風
 let jikaze = Kaze_Type.ton;
 
-//立直の有無
-let reach_flg = false;
+//立直の種類
+let reach_type = Reach_Type.none;
 
 //鳴きボタンのオブジェクト
 let btn_pong = document.getElementById('btn_pong');
@@ -2654,9 +2661,14 @@ function calcAgari(agari_kata){
                         chitoi_flg = true;
 
                         //立直
-                        if(reach_flg){
+                        if(reach_type == Reach_Type.reach){
                             honsuu += 1;
                             yaku_list.push(["1翻","立直"]);
+                        }
+                        //ダブル立直
+                        else if(reach_type == Reach_Type.doublereach){
+                            honsuu += 2;
+                            yaku_list.push(["2翻","ダブル立直"])
                         }
                         //面前清自模
                         if(isMenzenTsumo(agari_kata)){
@@ -2713,9 +2725,14 @@ function calcAgari(agari_kata){
                 //役満でない場合、一般役の判定を行う    
                 if(yaku_list.length == 0){
                     //立直
-                    if(reach_flg){
+                    if(reach_type == Reach_Type.reach){
                         honsuu += 1;
                         yaku_list.push(["1翻","立直"]);
+                    }
+                    //ダブル立直
+                    else if(reach_type == Reach_Type.doublereach){
+                        honsuu += 2;
+                        yaku_list.push(["2翻","ダブル立直"])
                     }
                     //面前清自模
                     if(isMenzenTsumo(agari_kata)){
@@ -3612,7 +3629,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_pong_click();
-            btn_reach_click();
+            clearBtnReach();
         }
         //チー（チーできるかどうかを調べてから行う）
         else if(mode_current == Mode.chi && isPossible_chi(pai_num) && count_tehai_pai(pai_num) < PAI_MAX){
@@ -3641,7 +3658,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_chi_click();
-            btn_reach_click();
+            clearBtnReach();
         }
         //暗槓（手配に1枚以上ある場合は行わない）
         else if(mode_current == Mode.ankan && count_tehai_pai(pai_num) <= 0){
@@ -3683,7 +3700,7 @@ for(let i = 0; i < table_pais.length; i++){
             }
 
             btn_minkan_click();
-            btn_reach_click();
+            clearBtnReach();
         }
         //聴牌の場合
         else if(mode_current == Mode.tenpai && count_tehai_pai(pai_num) < PAI_MAX && machihai_list.includes(pai_num)){
@@ -3947,18 +3964,32 @@ function btn_jikaze_sha_click(){
 function btn_jikaze_pei_click(){
     changeJikaze(Kaze_Type.pei);
 }
+//立直ボタンの解除
+function clearBtnReach(){
+    let btn_reach = document.getElementById('btn_reach');
+    btn_reach.style.color = "black";
+    btn_reach.firstChild.innerText = "立直";
+    reach_type = Reach_Type.none;
+}
 //立直
 function btn_reach_click(){
     let btn_reach = document.getElementById('btn_reach');
-    //立直ON状態で押下
-    if(reach_flg){
-        btn_reach.style.color = "black";
-        reach_flg = false;
-    }
-    //立直OFFかつ面前の状態で押下
-    else if(isMenzen()){
+    //立直OFFの状態かつ面前の状態で押下
+    if(reach_type == Reach_Type.none && isMenzen()){
+        //立直に切り替える
         btn_reach.style.color = "red";
-        reach_flg = true;
+        reach_type = Reach_Type.reach;
+    }
+    //通常の立直の状態で押下
+    else if(reach_type == Reach_Type.reach){
+        //ダブル立直に切り替える
+        btn_reach.firstChild.innerText = "ダブル立直";
+        reach_type = Reach_Type.doublereach;
+    }
+    //ダブル立直の状態で押下
+    else if(reach_type == Reach_Type.doublereach){
+        //通常時に戻す
+        clearBtnReach();
     }
 }
 //消去
