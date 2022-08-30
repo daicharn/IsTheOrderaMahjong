@@ -132,6 +132,7 @@ let modal_noten_body = document.getElementById('modal_noten_body');
 let modal_agari = document.getElementById('modal_agari');
 let modal_bakaze = document.getElementById('modal_bakaze');
 let modal_jikaze = document.getElementById('modal_jikaze');
+let modal_setting = document.getElementById('modal_setting');
 
 //手配入力・結果出力画面のオブジェクト
 let input_screen = document.getElementById('input_screen');
@@ -2703,6 +2704,15 @@ function calcAgari(agari_kata){
                             honsuu += 6;
                             yaku_list.push(["6翻","清一色"]);
                         }
+
+                        //ドラ（役が無い場合は追加しない）
+                        if(yaku_list.length != 0){
+                            let dora_value = document.getElementById('dora_num').value;
+                            if(Number(dora_value) != 0){
+                                honsuu += Number(dora_value);
+                                yaku_list.push([dora_value + "翻", "ドラ"]);
+                            }
+                        }
                     }
                 }
                 else{
@@ -2878,6 +2888,15 @@ function calcAgari(agari_kata){
                     else if(honsuu_chinitsu == 5){
                         honsuu += honsuu_chinitsu;
                         yaku_list.push(["5翻","清一色"]);
+                    }
+
+                    //ドラ（役が無い場合は追加しない）
+                    if(yaku_list.length != 0){
+                        let dora_value = document.getElementById('dora_num').value;
+                        if(Number(dora_value) != 0){
+                            honsuu += Number(dora_value);
+                            yaku_list.push([dora_value + "翻", "ドラ"]);
+                        }
                     }
                 }
             }
@@ -3851,23 +3870,28 @@ for(let i = 0; i < tehai_nakis.length; i++){
 
 //イベント登録（ノーテン用ダイヤログの閉じるボタン）
 let modal_noten_close = document.getElementById('modal_noten_close');
-modal_noten_close.addEventListener("click", (event) =>{
+modal_noten_close.addEventListener("click", () =>{
     modalNotenClose();
 });
 //イベント登録（アガリ用ダイヤログの閉じるボタン）
 let modal_agari_close = document.getElementById('modal_agari_close');
-modal_agari_close.addEventListener("click", (event) =>{
+modal_agari_close.addEventListener("click", () =>{
     modalAgariClose();
 });
 //イベント登録（場風用ダイヤログの閉じるボタン）
 let modal_bakaze_close = document.getElementById('modal_bakaze_close');
-modal_bakaze_close.addEventListener("click", (event) =>{
+modal_bakaze_close.addEventListener("click", () =>{
     modalBakazeClose();
 });
 //イベント登録（自風用ダイヤログの閉じるボタン）
 let modal_jikaze_close = document.getElementById('modal_jikaze_close');
-modal_jikaze_close.addEventListener("click", (event) =>{
+modal_jikaze_close.addEventListener("click", () =>{
     modalJikazeClose();
+});
+//イベント登録（設定用ダイヤログの閉じるボタン）
+let modal_setting_close = document.getElementById('modal_setting_close');
+modal_setting_close.addEventListener("click", () =>{
+    modalSettingClose();
 });
 //モーダルコンテンツ以外がクリックされた時のイベントをそれぞれのダイヤログに登録
 addEventListener("click", (event) =>{
@@ -3886,6 +3910,10 @@ addEventListener("click", (event) =>{
     //自風変更時
     if(event.target == modal_jikaze){
         modalJikazeClose();
+    }
+    //設定時
+    if(event.target == modal_setting){
+        modalSettingClose();
     }
 });
 //ノーテン用ダイヤログが閉じたときの処理
@@ -3927,6 +3955,10 @@ function modalBakazeClose(){
 //自風用ダイヤログが閉じたときの処理
 function modalJikazeClose(){
     modal_jikaze.style.display = "none";
+}
+//設定用ダイヤログが閉じたときの処理
+function modalSettingClose(){
+    modal_setting.style.display = "none";
 }
 
 //各種ボタン用関数
@@ -4053,6 +4085,30 @@ function btn_delete_click(){
             tehai_nakis[i].removeChild(tehai_nakis[i].lastChild);
         }
     }
+}
+//設定
+function btn_setting_click(){
+    //設定ダイヤログを表示する
+    modal_setting.style.display = "block";
+}
+//ドラのマイナスボタン
+function btn_doraminus_click(){
+    let dora_num = document.getElementById('dora_num');
+    if(!(Number(dora_num.value) == 0)){
+        dora_num.value = (Number(dora_num.value) - 1).toString();
+    }
+}
+//ドラのプラスボタン
+function btn_doraplus_click(){
+    let dora_num = document.getElementById('dora_num');
+    if(Number(dora_num.value) < 40){
+        dora_num.value = (Number(dora_num.value) + 1).toString();
+    }
+}
+//ドラのリセットボタン
+function btn_dorareset_click(){
+    let dora_num = document.getElementById('dora_num');
+    dora_num.value = "0";
 }
 
 //鳴きボタン用関数

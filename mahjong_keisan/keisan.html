@@ -19,6 +19,7 @@
       <div class="btn_part" id="btn_jikaze" onclick="btn_jikaze_click()"><p class="btn_label">自風(東)</p></div>
       <div class="btn_part" id="btn_reach" onclick="btn_reach_click()"><p class="btn_label">立直</p></div>
       <div class="btn_part" id="btn_delete" onclick="btn_delete_click()"><p class="btn_label">全消去</p></div>
+      <div class="btn_part" id="btn_setting" onclick="btn_setting_click()"><p class="btn_label">詳細設定</p></div>
     </div>
     <div id="select"></div>
     <div class="btnlist" id="btnlist_naki">
@@ -102,8 +103,25 @@
         <button type="button" class="btn_modal" id="btn_jikaze_pei" onclick="btn_jikaze_pei_click()">北</button>
        </div>
       </div>
-     </div>
-   </div>
+    </div>
+  </div>
+  <div id="modal_setting" class="modal">
+    <div class="modal_content">
+      <div class="modal_header">
+       <h1>詳細設定</h1>
+       <span id="modal_setting_close" class="modal_close">×</span>
+      </div>
+      <div id="modal_setting_body" class="modal_body">
+       <div id="setting_dora">
+        <p>ドラ</p>
+        <div class="btn_dora" id="btn_dora_minus" onclick="btn_doraminus_click()"><p class="btn_label">-</p></div>
+        <input type="number" id="dora_num" value="0" readonly>
+        <div class="btn_dora" id="btn_dora_minus" onclick="btn_doraplus_click()"><p class="btn_label">+</p></div>
+        <div class="btn_dora" id="btn_dora_reset" onclick="btn_dorareset_click()"><p class="btn_label">リセット</p></div>
+       </div>
+      </div>
+    </div>
+  </div>
  </body>
  <script src="../script_core.js"></script>
  <script src="script_keisan.js"></script>

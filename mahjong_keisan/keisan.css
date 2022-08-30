@@ -187,3 +187,33 @@ body{
 #btn_jikaze_ton{
     display: none;
 }
+
+#setting_dora{
+    display: flex;
+    margin: 10px 0;
+}
+.btn_dora{
+    width: 30px;
+    height: 30px;
+    margin: auto 10px;
+    background-color: rgb(184, 184, 184);
+    border: 1px solid rgb(95, 95, 95);
+    transition: background-color 0.3s;
+    font-weight: bold;
+    display: table;
+    user-select: none;
+    cursor: pointer;
+}
+.btn_dora:hover{
+    background-color: rgb(151, 151, 151);
+}
+#btn_dora_reset{
+    width: 100px;
+}
+#dora_num{
+    width: 40px;
+    height: 30px;
+    margin: auto 0;
+    font-size: 15px;
+    user-select: none;
+}
