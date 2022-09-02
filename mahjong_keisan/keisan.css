@@ -188,32 +188,57 @@ body{
     display: none;
 }
 
-#setting_dora{
+#setting_dora, #setting_honba, #setting_ippatsu{
     display: flex;
     margin: 10px 0;
 }
-.btn_dora{
+.btn_setting{
     width: 30px;
     height: 30px;
     margin: auto 10px;
-    background-color: rgb(184, 184, 184);
-    border: 1px solid rgb(95, 95, 95);
+    background-color: rgb(0, 172, 252);
+    border: 1px solid rgb(0, 103, 238);
     transition: background-color 0.3s;
     font-weight: bold;
     display: table;
     user-select: none;
     cursor: pointer;
 }
-.btn_dora:hover{
-    background-color: rgb(151, 151, 151);
+.btn_setting:hover{
+    background-color: rgb(0, 134, 196);
 }
-#btn_dora_reset{
+#btn_dora_reset, #btn_honba_reset{
     width: 100px;
 }
-#dora_num{
+.setting_num{
     width: 40px;
     height: 30px;
     margin: auto 0;
     font-size: 15px;
+    user-select: none;
+}
+.radio_ippatsu{
+    display: none;
+}
+.radio_ippatsu:checked + label{
+    background-color: orange;
+}
+.radio_ippatsu:enabled + label div{
+    background-color: rgb(0, 172, 252);
+    border: 1px solid rgb(0, 103, 238);
+    cursor: pointer;
+}
+.label_ippatsu{
+    margin: auto 10px;
+    padding: 5px;
+}
+.btn_ippatsu{
+    width: 80px;
+    height: 30px;
+    background-color: rgb(165, 165, 165);
+    border: 1px solid rgb(78, 78, 78);
+    transition: background-color 0.3s;
+    display: table;
+    font-weight: bold;
     user-select: none;
 }

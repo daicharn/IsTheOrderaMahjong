@@ -2669,7 +2669,13 @@ function calcAgari(agari_kata){
                         //ダブル立直
                         else if(reach_type == Reach_Type.doublereach){
                             honsuu += 2;
-                            yaku_list.push(["2翻","ダブル立直"])
+                            yaku_list.push(["2翻","ダブル立直"]);
+                        }
+                        //一発
+                        let ippatsu_flg = document.getElementById('radio_ippatsu_true').checked;
+                        if(ippatsu_flg){
+                            honsuu += 1;
+                            yaku_list.push(["1翻","一発"]);
                         }
                         //面前清自模
                         if(isMenzenTsumo(agari_kata)){
@@ -2742,7 +2748,13 @@ function calcAgari(agari_kata){
                     //ダブル立直
                     else if(reach_type == Reach_Type.doublereach){
                         honsuu += 2;
-                        yaku_list.push(["2翻","ダブル立直"])
+                        yaku_list.push(["2翻","ダブル立直"]);
+                    }
+                    //一発
+                    let ippatsu_flg = document.getElementById('radio_ippatsu_true').checked;
+                    if(ippatsu_flg){
+                        honsuu += 1;
+                        yaku_list.push(["1翻","一発"]);
                     }
                     //面前清自模
                     if(isMenzenTsumo(agari_kata)){
@@ -3205,6 +3217,7 @@ function displayTensuu(tensuu, tensuu_str, agari_kata){
     let tensuu_result_div = document.getElementById('tensuu_result');
     let tensuu_str_p = document.createElement('p');
     let tensuu_num_p = document.createElement('p');
+    let honba_num = Number(document.getElementById('honba_num').value);
     tensuu_str_p.innerText = tensuu_str;
     tensuu_result_div.appendChild(tensuu_str_p);
     //ツモかつ0点でない場合
@@ -3213,17 +3226,38 @@ function displayTensuu(tensuu, tensuu_str, agari_kata){
         if(jikaze == Kaze_Type.ton){
             let tensuu_all = Math.ceil((tensuu / 3) / 100) * 100; 
             tensuu_num_p.innerText = tensuu_all.toString() + "点 ALL";
+            //1本場ごとに100点（ALL）追加
+            if(honba_num > 0){
+                tensuu_num_p.innerText += " + " + honba_num.toString() + "本場" + "(" + (honba_num * 100).toString() + ")";
+            }
         }
         //子の場合
         else{
             let tensuu_child = Math.ceil((tensuu / 4) / 100) * 100; 
             let tensuu_parent = Math.ceil((tensuu / 2) / 100) * 100;
+            //1本場ごとに子と親の両方に100点ずつ追加
+            if(honba_num > 0){
+                tensuu_child += honba_num * 100;
+                tensuu_parent += honba_num * 100;
+            }
             tensuu_num_p.innerText = "子:" + tensuu_child.toString() + "点　親:" + tensuu_parent.toString() + "点";
+            //本場のラベルを追加
+            if(honba_num > 0){
+                tensuu_num_p.innerText += "(" + honba_num.toString() + "本場)";
+            }
         }
     }
-    //ロンの場合
-    else{
+    //ロンかつ0点でない場合
+    else if(agari_kata == Agari_Kata.ron && tensuu != 0){
         tensuu_num_p.innerText = tensuu.toString() + "点";
+        //1本場ごとに300点追加
+        if(honba_num > 0){
+            tensuu_num_p.innerText += " + " + honba_num.toString() + "本場" + "(" + (honba_num * 300).toString() + ")";
+        }
+    }
+    //役なし0点の場合
+    else if(tensuu == 0){
+        tensuu_num_p.innerText = "0点";
     }
 
     tensuu_result_div.appendChild(tensuu_num_p);
@@ -3996,12 +4030,25 @@ function btn_jikaze_sha_click(){
 function btn_jikaze_pei_click(){
     changeJikaze(Kaze_Type.pei);
 }
+//一発ラジオボタンの切り替え
+function toggleRadioIppatsu(flg){
+    let radio_ippatsu_false = document.getElementById('radio_ippatsu_false');
+    let radio_ippatsu_true = document.getElementById('radio_ippatsu_true');
+    radio_ippatsu_false.disabled = !flg;
+    radio_ippatsu_true.disabled = !flg;
+    //フラグがfalseの時は一発（無し）をチェック状態にする
+    if(!flg){
+        radio_ippatsu_false.checked = true;
+    }
+}
 //立直ボタンの解除
 function clearBtnReach(){
     let btn_reach = document.getElementById('btn_reach');
     btn_reach.style.color = "black";
     btn_reach.firstChild.innerText = "立直";
     reach_type = Reach_Type.none;
+    //一発ラジオボタンを無効化
+    toggleRadioIppatsu(false);
 }
 //立直
 function btn_reach_click(){
@@ -4011,6 +4058,8 @@ function btn_reach_click(){
         //立直に切り替える
         btn_reach.style.color = "red";
         reach_type = Reach_Type.reach;
+        //一発ラジオボタンを有効化
+        toggleRadioIppatsu(true);
     }
     //通常の立直の状態で押下
     else if(reach_type == Reach_Type.reach){
@@ -4109,6 +4158,25 @@ function btn_doraplus_click(){
 function btn_dorareset_click(){
     let dora_num = document.getElementById('dora_num');
     dora_num.value = "0";
+}
+//本場のマイナスボタン
+function btn_honbaminus_click(){
+    let honba_num = document.getElementById('honba_num');
+    if(!(Number(honba_num.value) == 0)){
+        honba_num.value = (Number(honba_num.value) - 1).toString();
+    }
+}
+//本場のプラスボタン
+function btn_honbaplus_click(){
+    let honba_num = document.getElementById('honba_num');
+    if(Number(honba_num.value) < 20){
+        honba_num.value = (Number(honba_num.value) + 1).toString();
+    }
+}
+//本場のリセットボタン
+function btn_honbareset_click(){
+    let honba_num = document.getElementById('honba_num');
+    honba_num.value = "0";
 }
 
 //鳴きボタン用関数

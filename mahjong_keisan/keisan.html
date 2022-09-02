@@ -114,10 +114,24 @@
       <div id="modal_setting_body" class="modal_body">
        <div id="setting_dora">
         <p>ドラ</p>
-        <div class="btn_dora" id="btn_dora_minus" onclick="btn_doraminus_click()"><p class="btn_label">-</p></div>
-        <input type="number" id="dora_num" value="0" readonly>
-        <div class="btn_dora" id="btn_dora_minus" onclick="btn_doraplus_click()"><p class="btn_label">+</p></div>
-        <div class="btn_dora" id="btn_dora_reset" onclick="btn_dorareset_click()"><p class="btn_label">リセット</p></div>
+        <div class="btn_setting" id="btn_dora_minus" onclick="btn_doraminus_click()"><p class="btn_label">-</p></div>
+        <input type="number" class="setting_num" id="dora_num" value="0" readonly>
+        <div class="btn_setting" id="btn_dora_minus" onclick="btn_doraplus_click()"><p class="btn_label">+</p></div>
+        <div class="btn_setting" id="btn_dora_reset" onclick="btn_dorareset_click()"><p class="btn_label">リセット</p></div>
+       </div>
+       <div id="setting_honba">
+        <p>本場</p>
+        <div class="btn_setting" id="btn_honba_minus" onclick="btn_honbaminus_click()"><p class="btn_label">-</p></div>
+        <input type="number" class="setting_num" id="honba_num" value="0" readonly>
+        <div class="btn_setting" id="btn_honba_minus" onclick="btn_honbaplus_click()"><p class="btn_label">+</p></div>
+        <div class="btn_setting" id="btn_honba_reset" onclick="btn_honbareset_click()"><p class="btn_label">リセット</p></div>
+       </div>
+       <div id="setting_ippatsu">
+        <p>一発の有無</p>
+        <input type="radio" name="ippatsu_flg" class="radio_ippatsu" id="radio_ippatsu_false" checked disabled>
+        <label class="label_ippatsu" for="radio_ippatsu_false"><div class="btn_ippatsu"><p class="btn_label">無し</p></div></label>
+        <input type="radio" name="ippatsu_flg" class="radio_ippatsu" id="radio_ippatsu_true" disabled>
+        <label class="label_ippatsu" for="radio_ippatsu_true"><div class="btn_ippatsu"><p class="btn_label">有り</p></div></label>
        </div>
       </div>
     </div>
