@@ -188,7 +188,7 @@ body{
     display: none;
 }
 
-#setting_dora, #setting_honba, #setting_ippatsu{
+#setting_dora, #setting_honba, #setting_ippatsu, #setting_special{
     display: flex;
     margin: 10px 0;
 }
@@ -196,8 +196,8 @@ body{
     width: 30px;
     height: 30px;
     margin: auto 10px;
-    background-color: rgb(0, 172, 252);
-    border: 1px solid rgb(0, 103, 238);
+    background-color: rgb(0, 193, 252);
+    border: 1px solid rgb(0, 151, 238);
     transition: background-color 0.3s;
     font-weight: bold;
     display: table;
@@ -205,7 +205,7 @@ body{
     cursor: pointer;
 }
 .btn_setting:hover{
-    background-color: rgb(0, 134, 196);
+    background-color: rgb(0, 162, 236);
 }
 #btn_dora_reset, #btn_honba_reset{
     width: 100px;
@@ -217,22 +217,25 @@ body{
     font-size: 15px;
     user-select: none;
 }
-.radio_ippatsu{
+.radio_ippatsu, .radio_special{
     display: none;
 }
-.radio_ippatsu:checked + label{
+.radio_ippatsu:checked + label, .radio_special:checked + label{
     background-color: orange;
 }
-.radio_ippatsu:enabled + label div{
-    background-color: rgb(0, 172, 252);
-    border: 1px solid rgb(0, 103, 238);
+.radio_ippatsu:enabled + label div, .radio_special:enabled + label div{
+    background-color: rgb(0, 193, 252);
+    border: 1px solid rgb(0, 151, 238);
     cursor: pointer;
 }
-.label_ippatsu{
+.label_ippatsu, .label_special{
     margin: auto 10px;
     padding: 5px;
 }
-.btn_ippatsu{
+.label_special{
+    margin: auto 5px;
+}
+.btn_ippatsu, .btn_special{
     width: 80px;
     height: 30px;
     background-color: rgb(165, 165, 165);

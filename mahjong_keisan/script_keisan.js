@@ -879,6 +879,8 @@ function changeJikaze(jikaze_new){
     let btn_nan = document.getElementById('btn_jikaze_nan');
     let btn_sha = document.getElementById('btn_jikaze_sha');
     let btn_pei = document.getElementById('btn_jikaze_pei');
+    //天和、地和のボタンのp要素を取得
+    let tenchi_p = document.getElementById('tenchi_p');
     //現在の自風のボタンを表示させる
     switch (jikaze){
         //東
@@ -905,24 +907,28 @@ function changeJikaze(jikaze_new){
             jikaze = jikaze_new;
             btn_jikaze.firstChild.innerText = "自風(東)"
             btn_ton.style.display = "none";
+            tenchi_p.innerText = "天和";
             break;
         //南
         case Kaze_Type.nan:
             jikaze = jikaze_new;
             btn_jikaze.firstChild.innerText = "自風(南)"
             btn_nan.style.display = "none";
+            tenchi_p.innerText = "地和";
             break;
         //西
         case Kaze_Type.sha:
             jikaze = jikaze_new;
             btn_jikaze.firstChild.innerText = "自風(西)"
             btn_sha.style.display = "none";
+            tenchi_p.innerText = "地和";
             break;
         //北
         case Kaze_Type.pei:
             jikaze = jikaze_new;
             btn_jikaze.firstChild.innerText = "自風(北)"
             btn_pei.style.display = "none";
+            tenchi_p.innerText = "地和";
             break;
     }
 
@@ -1270,6 +1276,30 @@ function getHaishu(pai_num){
     }
     else{
         return -1;
+    }
+}
+
+//天和の判定
+function isTenho(){
+    let tenchi_flg = document.getElementById('radio_tenchi').checked;
+    //天和、地和のラジオボタンがONかつ親であれば天和
+    if(tenchi_flg && jikaze == Kaze_Type.ton){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//地和の判定
+function isChiho(){
+    let tenchi_flg = document.getElementById('radio_tenchi').checked;
+    //天和、地和のラジオボタンがONかつ子であれば天和
+    if(tenchi_flg && jikaze != Kaze_Type.ton){
+        return true;
+    }
+    else{
+        return false;
     }
 }
 
@@ -2394,6 +2424,14 @@ function isSankantsu(){
 
 //役満をまとめて判定
 function hanteiYakumans(agari_list, agari_kata, yaku_list){
+    //天和
+    if(isTenho()){
+        yaku_list.push(["役満","天和"]);
+    }
+    //地和
+    else if(isChiho()){
+        yaku_list.push(["役満","地和"]);
+    }
     //四暗刻
     if(isSuuanko(agari_list, agari_kata)){
         //アガリ牌が雀頭であれば四暗刻単騎
@@ -2652,9 +2690,17 @@ function calcAgari(agari_kata){
             //対子が7個の形の場合は七対子かどうか判別する
             if(agari_lists[i].length == 7){
                 if(calcChiitoiShanten(countHais()) == -1){
-                    //字一色七対子（大七星）の場合は七対子を付けない
-                    if(isTsuiso(agari_lists[i])){
-                        yaku_list.push(["役満","字一色"]);
+                    //役満の場合は七対子を付けない
+                    if(isTenho() || isChiho() || isTsuiso(agari_lists[i])){
+                        if(isTenho()){
+                            yaku_list.push(["役満","天和"]);
+                        }
+                        else if(isChiho()){
+                            yaku_list.push(["役満","地和"]);
+                        }
+                        if(isTsuiso(agari_lists[i])){
+                            yaku_list.push(["役満","字一色"]);
+                        }
                         yakuman_flg_list.push(true);
                         chitoi_flg = true;
                     }
@@ -2676,6 +2722,30 @@ function calcAgari(agari_kata){
                         if(ippatsu_flg){
                             honsuu += 1;
                             yaku_list.push(["1翻","一発"]);
+                        }
+                        //嶺上開花
+                        let rinshan_flg = document.getElementById('radio_rinshan').checked;
+                        if(rinshan_flg){
+                            honsuu += 1;
+                            yaku_list.push(["1翻","嶺上開花"]);
+                        }
+                        //槍槓
+                        let chankan_flg = document.getElementById('radio_chankan').checked;
+                        if(chankan_flg){
+                            honsuu += 1;
+                            yaku_list.push(["1翻","槍槓"]);
+                        }
+                        //海底撈月
+                        let haitei_flg = document.getElementById('radio_haitei').checked;
+                        if(haitei_flg){
+                            honsuu += 1;
+                            yaku_list.push(["1翻","海底撈月"]);
+                        }
+                        //河底撈魚
+                        let houtei_flg = document.getElementById('radio_houtei').checked;
+                        if(houtei_flg){
+                            honsuu += 1;
+                            yaku_list.push(["1翻","河底撈魚"]);
                         }
                         //面前清自模
                         if(isMenzenTsumo(agari_kata)){
@@ -2755,6 +2825,30 @@ function calcAgari(agari_kata){
                     if(ippatsu_flg){
                         honsuu += 1;
                         yaku_list.push(["1翻","一発"]);
+                    }
+                    //嶺上開花
+                    let rinshan_flg = document.getElementById('radio_rinshan').checked;
+                    if(rinshan_flg){
+                        honsuu += 1;
+                        yaku_list.push(["1翻","嶺上開花"]);
+                    }
+                    //槍槓
+                    let chankan_flg = document.getElementById('radio_chankan').checked;
+                    if(chankan_flg){
+                        honsuu += 1;
+                        yaku_list.push(["1翻","槍槓"]);
+                    }
+                    //海底撈月
+                    let haitei_flg = document.getElementById('radio_haitei').checked;
+                    if(haitei_flg){
+                        honsuu += 1;
+                        yaku_list.push(["1翻","海底撈月"]);
+                    }
+                    //河底撈魚
+                    let houtei_flg = document.getElementById('radio_houtei').checked;
+                    if(houtei_flg){
+                        honsuu += 1;
+                        yaku_list.push(["1翻","河底撈魚"]);
                     }
                     //面前清自模
                     if(isMenzenTsumo(agari_kata)){
@@ -3097,7 +3191,7 @@ function calcAgari(agari_kata){
         }
 
         //最大の点数であればその点数と添え字を記憶する
-        if(tensuu < tensuu_candidate){
+        if(tensuu <= tensuu_candidate){
             tensuu = tensuu_candidate;
             tensuu_str = tensuu_str_candidate;
             maxtensuu_index = i;
@@ -3683,6 +3777,8 @@ for(let i = 0; i < table_pais.length; i++){
 
             btn_pong_click();
             clearBtnReach();
+            //天和、地和ボタンの無効化
+            toggleRadioTenchi(false);
         }
         //チー（チーできるかどうかを調べてから行う）
         else if(mode_current == Mode.chi && isPossible_chi(pai_num) && count_tehai_pai(pai_num) < PAI_MAX){
@@ -3712,6 +3808,8 @@ for(let i = 0; i < table_pais.length; i++){
 
             btn_chi_click();
             clearBtnReach();
+            //天和、地和ボタンの無効化
+            toggleRadioTenchi(false);
         }
         //暗槓（手配に1枚以上ある場合は行わない）
         else if(mode_current == Mode.ankan && count_tehai_pai(pai_num) <= 0){
@@ -3733,6 +3831,10 @@ for(let i = 0; i < table_pais.length; i++){
 
             btn_ankan_click();
             //暗槓の時は立直の解除の必要なし
+            //天和、地和ボタンの無効化
+            toggleRadioTenchi(false);
+            //嶺上開花ボタンの有効化
+            toggleRadioRinshan(true);
         }
         //明槓（手配に1枚以上ある場合は行わない）
         else if(mode_current == Mode.minkan && count_tehai_pai(pai_num) <= 0){
@@ -3754,6 +3856,10 @@ for(let i = 0; i < table_pais.length; i++){
 
             btn_minkan_click();
             clearBtnReach();
+            //天和、地和ボタンの無効化
+            toggleRadioTenchi(false);
+            //嶺上開花ボタンの有効化
+            toggleRadioRinshan(true);
         }
         //聴牌の場合
         else if(mode_current == Mode.tenpai && count_tehai_pai(pai_num) < PAI_MAX && machihai_list.includes(pai_num)){
@@ -3897,6 +4003,22 @@ for(let i = 0; i < tehai_nakis.length; i++){
                 machihai_list.length = 0;
                 //モードを通常に戻す
                 mode_current = Mode.normal;
+            }
+
+            //鳴きリストが0になったら天和、地和ボタンを有効化
+            if(naki_pais_list.length == 0){
+                toggleRadioTenchi(true);
+            }
+            //鳴きリストからカンがなくなったら嶺上開花ボタンを無効化
+            let kan_count = 0;
+            for(let i = 0; i < naki_type_list.length; i++){
+                //暗槓、明槓の両方をカウントする
+                if(naki_type_list[i] == Naki_Type.ankan || naki_type_list[i] == Naki_Type.minkan){
+                    kan_count++;
+                }
+            }
+            if(kan_count == 0){
+                toggleRadioRinshan(false);
             }
         }
     });
@@ -4134,6 +4256,10 @@ function btn_delete_click(){
             tehai_nakis[i].removeChild(tehai_nakis[i].lastChild);
         }
     }
+
+    //特殊役のラジオボタンをリセット
+    toggleRadioTenchi(true);
+    toggleRadioRinshan(false);
 }
 //設定
 function btn_setting_click(){
@@ -4177,6 +4303,26 @@ function btn_honbaplus_click(){
 function btn_honbareset_click(){
     let honba_num = document.getElementById('honba_num');
     honba_num.value = "0";
+}
+//天和、地和ラジオボタンの切り替え
+function toggleRadioTenchi(flg){
+    let radio_tenchi = document.getElementById('radio_tenchi');
+    radio_tenchi.disabled = !flg;
+    //フラグがfalseの時は「なし」ボタンに移行する
+    if(!flg){
+        let radio_none = document.getElementById('radio_none');
+        radio_none.checked = true;
+    }
+}
+//嶺上開花ラジオボタンの切り替え
+function toggleRadioRinshan(flg){
+    let radio_rinshan = document.getElementById('radio_rinshan');
+    radio_rinshan.disabled = !flg;
+    //フラグがfalseの時は「なし」ボタンに移行する
+    if(!flg){
+        let radio_none = document.getElementById('radio_none');
+        radio_none.checked = true;
+    }
 }
 
 //鳴きボタン用関数
