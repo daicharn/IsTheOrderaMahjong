@@ -111,3 +111,28 @@ body{
 #color_marker{
     margin-left: 10px;
 }
+
+#setting_jihai{
+    display: flex;
+    margin: 10px 0;
+}
+.radio_jihai{
+    display: none;
+}
+.radio_jihai:checked + label{
+    background-color: orange;
+}
+.label_jihai{
+    margin: auto 5px;
+    padding: 5px;
+}
+.btn_jihai{
+    width: 80px;
+    height: 30px;
+    background-color: rgb(0, 193, 252);
+    border: 1px solid rgb(0, 151, 238);
+    transition: background-color 0.3s;
+    display: table;
+    font-weight: bold;
+    user-select: none;
+}

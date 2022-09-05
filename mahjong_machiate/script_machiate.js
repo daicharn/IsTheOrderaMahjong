@@ -37,17 +37,17 @@ let modal_answer = document.getElementById('modal_answer');
 let modal_answer_body = document.getElementById('modal_answer_body');
 let modal_haishu = document.getElementById('modal_haishu');
 let modal_marker = document.getElementById('modal_marker');
+let modal_setting = document.getElementById('modal_setting');
 
 //手牌の基盤を生成
-for(i = 0; i < tehai_count[0].length; i++){
-    for(let j = 0; j < tehai_count[0][i]; j++){
-        let div_element = document.createElement('div');
-        let img_element = document.createElement('img');
-        div_element.className = "tehai_part";
-        div_element.appendChild(img_element);
-        document.getElementById('tehai').appendChild(div_element);
-    }
+for(i = 0; i < 13; i++){
+    let div_element = document.createElement('div');
+    let img_element = document.createElement('img');
+    div_element.className = "tehai_part";
+    div_element.appendChild(img_element);
+    document.getElementById('tehai').appendChild(div_element);
 }
+
 
 //手牌のリスト
 let tehai_parts = document.getElementsByClassName('tehai_part');
@@ -126,25 +126,30 @@ thinMaxHaiCell();
 //手牌の画像を画面に挿入
 function insertTehaiImage(hai_type){
     let count = 0;
-    for(i = 0; i < tehai_count[0].length; i++){
-        for(let j = 0; j < tehai_count[0][i]; j++){
-            let img_element = tehai_parts[count].firstChild;
-            img_element.src = ScriptCore.generate_pai_src(hai_type * 9 + i + 1);
-            count++;
+    for(i = 0; i < tehai_count.length; i++){
+        for(j = 0; j < tehai_count[i].length; j++){
+            for(let k = 0; k < tehai_count[i][j]; k++){
+                let img_element = tehai_parts[count].firstChild;
+                //字牌でない場合
+                if(i != 3){
+                    img_element.src = ScriptCore.generate_pai_src(hai_type * 9 + j + 1);
+                }
+                //字牌の場合
+                else{
+                    img_element.src = ScriptCore.generate_pai_src(27 + j + 1);
+                }
+                count++;
+            }
         }
     }
 }
 
 //手牌のマーカーを全て消去する
 function removeTehaiMarker(){
-    let count = 0;
-    for(i = 0; i < tehai_count[0].length; i++){
-        for(let j = 0; j < tehai_count[0][i]; j++){
-            if(!(tehai_parts[count].style.backgroundColor == "")){
-                tehai_parts[count].style.backgroundColor = "";
-                tehai_parts[count].firstChild.style.opacity = "1";
-            }
-            count++;
+    for(i = 0; i < 13; i++){
+        if(!(tehai_parts[i].style.backgroundColor == "")){
+            tehai_parts[i].style.backgroundColor = "";
+            tehai_parts[i].firstChild.style.opacity = "1";
         }
     }    
 }
@@ -223,6 +228,32 @@ function generateTehai(){
     }
     else{
         mentsu_num = 4;
+    }
+
+    //字牌の刻子の指定がある場合は先に追加する
+    let radios_jihai = document.getElementsByClassName('radio_jihai');
+    let jihai_num = 0;
+    for(let i = 0; i < radios_jihai.length; i++){
+        if(radios_jihai[i].checked){
+            jihai_num = i;
+        }
+    }
+    //字牌の刻子の数だけ通常の面子の数を減らす
+    mentsu_num -= jihai_num;
+    //字牌の刻子を生成する
+    for(let i = 0; i < jihai_num; i++){
+        while(true){
+            //1から7までをランダムに生成
+            let jihai_rand = Math.floor(Math.random() * 7) + 1;
+            //牌が一つでも使われていたら再度違う刻子を生成する
+            if(result_list[3][jihai_rand - 1] < 1){
+                result_list[3][jihai_rand - 1] += 3;
+                break;
+            }
+            else{
+                continue;
+            }
+        }
     }
 
     //面子を生成する
@@ -549,6 +580,10 @@ function btn_haishu_enter_click(){
 function btn_marker_click(){
     modal_marker.style.display = "block";
 }
+//設定ボタンが押された時
+function btn_setting_click(){
+    modal_setting.style.display = "block";
+}
 
 //イベント登録（解答用ダイヤログの閉じるボタン）
 let modal_answer_close = document.getElementById('modal_answer_close');
@@ -565,6 +600,11 @@ let modal_marker_close = document.getElementById('modal_marker_close');
 modal_marker_close.addEventListener("click", () => {
     modalMarkerClose();
 })
+//イベント登録（設定用ダイヤログの閉じるボタン）
+let modal_setting_close = document.getElementById('modal_setting_close');
+modal_setting_close.addEventListener("click", () => {
+    modalSettingClose();
+})
 //モーダルコンテンツ以外がクリックされた時のイベントをそれぞれのダイヤログに登録
 addEventListener("click", (event) =>{
     //解答時
@@ -578,6 +618,10 @@ addEventListener("click", (event) =>{
     //マーカー時
     else if(event.target == modal_marker){
         modalMarkerClose();
+    }
+    //設定時
+    else if(event.target == modal_setting){
+        modalSettingClose();
     }
 });
 //解答用ダイヤログが閉じたときの処理
@@ -594,6 +638,10 @@ function modalHaishuClose(){
 //マーカー用ダイヤログが閉じたときの処理
 function modalMarkerClose(){
     modal_marker.style.display = "none";
+}
+//設定用ダイヤログが閉じたときの処理
+function modalSettingClose(){
+    modal_setting.style.display = "none";
 }
 
 //モーダルが開いているかどうか確認する
@@ -628,6 +676,9 @@ document.onkeydown = (event) =>{
         }
         else if(modal_marker.style.display == "block"){
             modalMarkerClose();
+        }
+        else if(modal_setting.style.display == "block"){
+            modalSettingClose();
         }
         //通常時は選択した牌をクリア
         else{

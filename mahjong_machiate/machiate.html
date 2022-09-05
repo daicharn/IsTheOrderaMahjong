@@ -16,7 +16,7 @@
   <div class="btnlist">
     <div class="btn_part" id="btn_marker" onclick="btn_marker_click()"><p class="btn_label">マーカー</p></div>
     <div class="btn_part" id="btn_haishu" onclick="btn_haishu_click()"><p class="btn_label">牌種の変更</p></div>
-    <div class="btn_part" id="btn_setting" onclick=""><p class="btn_label">詳細設定</p></div>
+    <div class="btn_part" id="btn_setting" onclick="btn_setting_click()"><p class="btn_label">詳細設定</p></div>
   </div>
   <div id="modal_answer" class="modal">
     <div class="modal_content">
@@ -69,6 +69,28 @@
      </div>
     </div>
   </div>
+  <div id="modal_setting" class="modal">
+    <div class="modal_content">
+     <div class="modal_header">
+       <h1>詳細設定</h1>
+       <span id="modal_setting_close" class="modal_close">×</span>
+     </div>
+     <div id="modal_setting_body" class="modal_body">
+      <div id="setting_jihai">
+       <p>字牌の刻子の個数</p>
+       <input type="radio" name="jihai_select" class="radio_jihai" id="radio_jihai_0" checked>
+       <label class="label_jihai" for="radio_jihai_0"><div class="btn_jihai"><p class="btn_label">無し</p></div></label>
+       <input type="radio" name="jihai_select" class="radio_jihai" id="radio_jihai_1">
+       <label class="label_jihai" for="radio_jihai_1"><div class="btn_jihai"><p class="btn_label">1個</p></div></label>
+       <input type="radio" name="jihai_select" class="radio_jihai" id="radio_jihai_2">
+       <label class="label_jihai" for="radio_jihai_2"><div class="btn_jihai"><p class="btn_label">2個</p></div></label>
+       <input type="radio" name="jihai_select" class="radio_jihai" id="radio_jihai_3">
+       <label class="label_jihai" for="radio_jihai_3"><div class="btn_jihai"><p class="btn_label">3個</p></div></label>
+      </div>
+      <p>次の問題から適用されます</p>
+     </div>
+    </div>
+  </div> 
  </body>
  <script src="../script_core.js"></script>
  <script src="script_machiate.js"></script>
