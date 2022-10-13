@@ -471,6 +471,15 @@ function generateMaxHaiList(tehai_list){
     return result_list;
 }
 
+//受け入れ枚数の計算
+function getUkeireMaisuu(){
+    let result = 0;
+    for(let i = 0; i < machihai_list.length; i++){
+        result += 4 - tehai_count[0][machihai_list[i] - 1];
+    }
+    return result;
+}
+
 //クリアボタンが押された時
 function btn_clear_click(){
     for(let i = 0; i < select_cells.length; i++){
@@ -485,7 +494,8 @@ function btn_clear_click(){
 function btn_answer_click(){
     //実際の解答をモーダルに表示
     let true_answer_p = document.createElement('p');
-    true_answer_p.innerText = "実際の解答";
+    true_answer_p.innerText = "実際の解答 ";
+    true_answer_p.style.fontWeight = "bold";
     let true_answer_div = document.createElement('div');
     true_answer_div.style.display = "flex";
     for(let i = 0; i < machihai_list.length; i++){
@@ -497,9 +507,14 @@ function btn_answer_click(){
     }
     modal_answer_body.appendChild(true_answer_p);
     modal_answer_body.appendChild(true_answer_div);
+    //待ちの数と受け入れ枚数を表示
+    let ukeire_p = document.createElement('p');
+    ukeire_p.innerText = "（" + machihai_list.length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
+    modal_answer_body.appendChild(ukeire_p);
     //ユーザの解答をモーダルに表示
     let user_answer_p = document.createElement('p');
     user_answer_p.innerText = "あなたの回答";
+    user_answer_p.style.fontWeight = "bold";
     let user_answer_div = document.createElement('div');
     user_answer_div.style.display = "flex";
     for(let i = 0; i < select_flgs.length; i++){
