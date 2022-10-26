@@ -2750,7 +2750,7 @@ function calcAgari(agari_kata){
                         //面前清自模
                         if(isMenzenTsumo(agari_kata)){
                             honsuu += 1;
-                            yaku_list.push(["1翻","自模"]);
+                            yaku_list.push(["1翻","面前清自模和"]);
                             mentsumo_flg = true;
                         }
                         //断么九
@@ -2853,7 +2853,7 @@ function calcAgari(agari_kata){
                     //面前清自模
                     if(isMenzenTsumo(agari_kata)){
                         honsuu += 1;
-                        yaku_list.push(["1翻","自模"]);
+                        yaku_list.push(["1翻","面前清自模和"]);
                         mentsumo_flg = true;
                     }
                     //断么九

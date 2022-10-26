@@ -96,8 +96,8 @@ class ScriptCore{
         for(let i = 0; i < PAI_TYPE_NUM; i++){
             let haishu = Math.floor(i / 9);
             let count = hais_count[haishu][i % 9];
-            //雀頭、対子の処理
-            if(count >= 2){
+            //雀頭、対子の処理（対子1以上かつ面子3以上　または　面子0かつ塔子0の時のみ対子を抜き出す）
+            if(count >= 2 && ((toitsu_count > 0 && mentsu_count >= 3) || (mentsu_count == 0 && taatsu_count == 0))){
                 let copied_hais = this.copyArray(hais_count);
                 //面子が3枚で対子が2枚のシャンポン待ちの待ち牌をリストに追加
                 if(mentsu_count + naki_count >= 3 && toitsu_count >= 1){
