@@ -14,6 +14,12 @@ const Hai_Type = {
     souzu : 2
 }
 
+//モード
+const Mode = {
+    normal : 0,
+    makeprob : 1
+}
+
 //手牌
 let tehai_count = generateTehai();
 //待ちのリスト
@@ -23,6 +29,8 @@ while(machihai_list.length == 0){
     tehai_count = generateTehai();
     machihai_list = generateMachiList(tehai_count);    
 }
+//問題作成用の手牌のリスト
+let tehai_list_makeprob = [];
 //4枚使われている牌のリスト
 let maxhai_list = generateMaxHaiList(tehai_count);
 
@@ -31,6 +39,9 @@ let select_flgs = new Array(9).fill(false);
 
 //表示する牌種(初期値は萬子)
 let display_haishu = Hai_Type.manzu;
+
+//モード
+let mode = Mode.normal;
 
 //ダイヤログ用のオブジェクト
 let modal_answer = document.getElementById('modal_answer');
@@ -47,26 +58,62 @@ for(i = 0; i < 13; i++){
     div_element.appendChild(img_element);
     document.getElementById('tehai').appendChild(div_element);
 }
-
+//問題作成用の手牌の基盤を生成
+for(i = 0; i < 13; i++){
+    let div_element = document.createElement('div');
+    let img_element = document.createElement('img');
+    img_element.src = ScriptCore.generate_pai_src(BACK);
+    div_element.className = "tehai_part_makeprob";
+    div_element.style.cursor = "pointer";
+    div_element.appendChild(img_element);
+    document.getElementById('tehai_makeprob').appendChild(div_element);
+}
 
 //手牌のリスト
 let tehai_parts = document.getElementsByClassName('tehai_part');
 //クリック時のイベント登録
 for(let i = 0; i < tehai_parts.length; i++){
     tehai_parts[i].addEventListener("click", () =>{
-        let marker_enabled = document.getElementById('checkbox_marker').checked
-        //マーカーが有効の時
-        if(marker_enabled){
-            //色がついていなければ色を付ける
-            if(tehai_parts[i].style.backgroundColor == ""){
-                let color = document.getElementById('color_marker').value;
-                tehai_parts[i].style.backgroundColor = color;
-                tehai_parts[i].firstChild.style.opacity = "0.5";
+        //通常モード時
+        if(mode == Mode.normal){
+            let marker_enabled = document.getElementById('checkbox_marker').checked
+            //マーカーが有効の時
+            if(marker_enabled){
+                //色がついていなければ色を付ける
+                if(tehai_parts[i].style.backgroundColor == ""){
+                    let color = document.getElementById('color_marker').value;
+                    tehai_parts[i].style.backgroundColor = color;
+                    tehai_parts[i].firstChild.style.opacity = "0.5";
+                }
+                //色がついていれば色を消す
+                else{
+                    tehai_parts[i].style.backgroundColor = "";
+                    tehai_parts[i].firstChild.style.opacity = "1";
+                }
             }
-            //色がついていれば色を消す
-            else{
-                tehai_parts[i].style.backgroundColor = "";
-                tehai_parts[i].firstChild.style.opacity = "1";
+        }
+    });
+}
+
+//問題作成用の手牌のリスト
+let tehai_parts_makeprob = document.getElementsByClassName('tehai_part_makeprob');
+//クリック時のイベント登録
+for(let i = 0; i < tehai_parts_makeprob.length; i++){
+    tehai_parts_makeprob[i].addEventListener("click", () =>{
+        //問題作成モード時
+        if(mode == Mode.makeprob){
+            //牌があれば消去する
+            if(i < tehai_list_makeprob.length){
+                let tehai_num = tehai_list_makeprob[i];
+                //消去前に4枚であればテーブルの牌を表に戻す
+                if(tehai_list_makeprob.filter(n => n === tehai_num).length == 4){
+                    select_cells[tehai_num - 1].firstChild.src = ScriptCore.generate_pai_src(display_haishu * 9 + tehai_num);
+                }
+                //牌の消去処理
+                tehai_list_makeprob[i] = BACK;
+                setTehaimakeprobimg(i + 1, BACK);
+                sortTehaimakeprob();
+                tehai_list_makeprob.pop();
             }
         }
     });
@@ -95,22 +142,49 @@ let select_cells = document.getElementsByClassName('select_cell');
 //クリック時のイベント登録
 for(let i = 0; i < select_cells.length; i++){
     select_cells[i].addEventListener("click", () =>{
-        //4枚使われている牌はクリックを無効
-        if(!maxhai_list.includes(i + 1)){
-            let cell = select_cells[i];
-            //対象のボタンのフラグがONの時
-            if(select_flgs[i]){
-                //セルの牌を赤くする
-                transparentCellImg(cell);
-                //フラグをOFFにする
-                select_flgs[i] = false;
+        //通常モード時
+        if(mode == Mode.normal){
+            //4枚使われている牌はクリックを無効
+            if(!maxhai_list.includes(i + 1)){
+                let cell = select_cells[i];
+                //対象のボタンのフラグがONの時
+                if(select_flgs[i]){
+                    //セルの牌を赤くする
+                    transparentCellImg(cell);
+                    //フラグをOFFにする
+                    select_flgs[i] = false;
+                }
+                //対象のボタンのフラグがOFFの時
+                else{
+                    //セルの牌を透明にする
+                    redCellImg(cell);
+                    //フラグをONにする
+                    select_flgs[i] = true;
+                }
             }
-            //対象のボタンのフラグがOFFの時
-            else{
-                //セルの牌を透明にする
-                redCellImg(cell);
-                //フラグをONにする
-                select_flgs[i] = true;
+        }
+        //問題作成モード時
+        else if(mode == Mode.makeprob){
+            //問題作成用の手牌内に存在するクリックされた牌の個数
+            let pai_count = tehai_list_makeprob.filter(n => n === i + 1).length;
+            //4枚以上使用されていなければ手牌追加の処理を行う
+            if(pai_count < 4){
+                //現在の手牌の数を計算する
+                let tehai_current = tehai_list_makeprob.length;
+                //手牌が13枚より少ない場合のみ実行
+                if(tehai_current < 13){
+                    //画像の差し替え
+                    setTehaimakeprobimg(tehai_current + 1, display_haishu * 9 + i + 1);
+                    //手牌に追加
+                    tehai_list_makeprob.push(i + 1);
+                    //手牌のソート
+                    sortTehaimakeprob();
+
+                    //牌の上限の4枚に到達したらテーブル上のその牌を裏返しにする
+                    if(pai_count >= 3){
+                        select_cells[i].firstChild.src = ScriptCore.generate_pai_src(BACK);
+                    }   
+                }
             }
         }
     });
@@ -122,6 +196,42 @@ insertTehaiImage(display_haishu);
 insertImgSelectTable(display_haishu);
 //4枚使用されている牌のセルの画像を薄くする
 thinMaxHaiCell();
+
+//問題作成用の手牌の画像の設定
+function setTehaimakeprobimg(i, src){
+    let tehai_img = tehai_parts_makeprob[i - 1].firstChild;
+    tehai_img.src = ScriptCore.generate_pai_src(src);
+}
+//問題作成用の手牌のソート
+function sortTehaimakeprob(){
+    for(let i = 0; i < tehai_list_makeprob.length - 1; i++){
+        let m = i;
+        for(let j = i + 1; j < tehai_list_makeprob.length; j++){
+            if(tehai_list_makeprob[j] < tehai_list_makeprob[m]){
+                m = j;
+            }
+        }
+        //手牌の画像の入れ替え（どちらかが裏返しの牌だった場合は処理を配慮する）
+        if(tehai_list_makeprob[m] === BACK){
+            setTehaimakeprobimg(i + 1, BACK);
+            setTehaimakeprobimg(m + 1, display_haishu * 9 + tehai_list_makeprob[i]);
+        }
+        else if(tehai_list_makeprob[i] === BACK){
+            setTehaimakeprobimg(i + 1, display_haishu * 9 + tehai_list_makeprob[m]);
+            setTehaimakeprobimg(m + 1, BACK);
+        }
+        //どちらも裏返しでない場合
+        else{
+            setTehaimakeprobimg(i + 1, display_haishu * 9 + tehai_list_makeprob[m]);
+            setTehaimakeprobimg(m + 1, display_haishu * 9 + tehai_list_makeprob[i]);
+        }
+        //手牌の値の入れ替え
+        let temp_value = tehai_list_makeprob[i];
+        tehai_list_makeprob[i] = tehai_list_makeprob[m];
+        tehai_list_makeprob[m] = temp_value;
+    }
+}
+
 
 //手牌の画像を画面に挿入
 function insertTehaiImage(hai_type){
@@ -141,6 +251,14 @@ function insertTehaiImage(hai_type){
                 count++;
             }
         }
+    }
+}
+
+//問題作成用の手牌を初期化する
+function initTehaiMakeprobImage(){
+    for(let i = 0; i < tehai_parts_makeprob.length; i++){
+        let tehai_part_image = tehai_parts_makeprob[i].firstChild;
+        tehai_part_image.src = ScriptCore.generate_pai_src(BACK);
     }
 }
 
@@ -480,15 +598,43 @@ function getUkeireMaisuu(){
     return result;
 }
 
-//クリアボタンが押された時
-function btn_clear_click(){
+//状態テキストの変更
+function changeStateText(str){
+    let state_text_div = document.getElementById('state_text');
+    state_text_div.innerText = str;
+}
+//セルの選択（画像）を表示
+function viewSelectCellsImg(){
+    for(let i = 0; i < select_cells.length; i++){
+        let cell = select_cells[i];
+        if(select_flgs[i]){
+            redCellImg(cell);
+        }
+    }
+}
+//セルの選択（画像）をクリア
+function clearSelectCellsImg(){
     for(let i = 0; i < select_cells.length; i++){
         let cell = select_cells[i];
         if(select_flgs[i]){
             transparentCellImg(cell);
+        }
+    }
+}
+//セルの選択（フラグ）をクリア
+function clearSelectCellsflg(){
+    for(let i = 0; i < select_cells.length; i++){
+        let cell = select_cells[i];
+        if(select_flgs[i]){
             select_flgs[i] = false;
         }
     }
+}
+
+//クリアボタンが押された時
+function btn_clear_click(){
+    clearSelectCellsImg();
+    clearSelectCellsflg();
 }
 //解答ボタンが表示された時
 function btn_answer_click(){
@@ -598,6 +744,115 @@ function btn_marker_click(){
 //設定ボタンが押された時
 function btn_setting_click(){
     modal_setting.style.display = "block";
+}
+//問題を作成ボタンが押された時
+function btn_makeprob_click(){
+    let btnlist_normal = document.getElementById('btnlist_normal');
+    let btnlist_makeprob = document.getElementById('btnlist_makeprob');
+    let tehai_div = document.getElementById('tehai');
+    let tehai_makeprob_div = document.getElementById('tehai_makeprob');
+    btnlist_normal.style.display = "none";
+    btnlist_makeprob.style.display = "flex";
+    tehai_div.style.zIndex = "0";
+    tehai_makeprob_div.style.zIndex = "1";
+    //状態テキストの変更
+    changeStateText("手牌を入力してください");
+    //4枚使われている牌の半透明化を解除
+    normalMaxHaiCell();
+    //テーブルの選択を解除
+    clearSelectCellsImg();
+    //問題作成モードに変更
+    mode = Mode.makeprob;
+}
+//問題作成中のキャンセルボタンが押された時
+function btn_cancel_makeprob_click(){
+    let btnlist_normal = document.getElementById('btnlist_normal');
+    let btnlist_makeprob = document.getElementById('btnlist_makeprob');
+    let tehai_div = document.getElementById('tehai');
+    let tehai_makeprob_div = document.getElementById('tehai_makeprob');
+    btnlist_normal.style.display = "block";
+    btnlist_makeprob.style.display = "none";
+    tehai_div.style.zIndex = "1";
+    tehai_makeprob_div.style.zIndex = "0";
+    //状態テキストの変更
+    changeStateText("待ち牌を選択してください");
+    //4枚使われている牌を再度半透明化
+    thinMaxHaiCell();
+    //テーブルの選択状態を元に戻す
+    viewSelectCellsImg();
+    //テーブルの牌を元に戻す（裏返しになったものを表にする）
+    insertImgSelectTable(display_haishu);
+    //問題作成用の手牌を初期化
+    tehai_list_makeprob.length = 0;
+    initTehaiMakeprobImage();
+    //通常モードに変更
+    mode = Mode.normal;
+}
+//問題作成中の決定ボタンが押された時
+function btn_enter_makeprob_click(){
+    if(tehai_list_makeprob.length >= TEHAI_NUMBER - 1){
+        //手牌のリストから手牌の配列を作成
+        let tehai_count_makeprob = ScriptCore.createCountHaisBase();
+        for(let i = 0; i < tehai_list_makeprob.length; i++){
+            tehai_count_makeprob[0][tehai_list_makeprob[i] - 1]++
+        }
+
+        //待ちのリストを仮生成
+        machihai_list_temp = generateMachiList(tehai_count_makeprob);
+
+        //確認ダイヤログを表示する
+        if(!confirm("現在の問題は消去されますがよろしいでしょうか。")){
+            return;
+        }
+
+        //待ち牌が一枚も存在しない場合は追加の確認ダイアログを表示する
+        if(machihai_list_temp.length === 0){
+            //キャンセルが押された場合問題の作成を中止
+            if(!confirm("待ち牌が一枚も存在しませんが問題を作成してよろしいでしょうか。")){
+                return;
+            }
+        }
+
+        //以下、問題作成の処理
+        tehai_count = ScriptCore.copyArray(tehai_count_makeprob);
+        //手牌のマーカーを消去
+        removeTehaiMarker();
+
+        //仮作成した待ちのリストを使用
+        machihai_list = machihai_list_temp.slice();
+        //4枚使われている牌のリスト
+        maxhai_list = generateMaxHaiList(tehai_count);
+        //手牌の画像を画面に挿入
+        insertTehaiImage(display_haishu);
+        //4枚使用されている牌のセルの画像を薄くする
+        thinMaxHaiCell();
+
+        //テーブルのフラグを削除する
+        clearSelectCellsflg();
+        //テーブルの牌を元に戻す（裏返しになったものを表にする）
+        insertImgSelectTable(display_haishu);
+        //問題作成用の手牌を初期化
+        tehai_list_makeprob.length = 0;
+        initTehaiMakeprobImage();
+
+        let btnlist_normal = document.getElementById('btnlist_normal');
+        let btnlist_makeprob = document.getElementById('btnlist_makeprob');
+        let tehai_div = document.getElementById('tehai');
+        let tehai_makeprob_div = document.getElementById('tehai_makeprob');
+        btnlist_normal.style.display = "block";
+        btnlist_makeprob.style.display = "none";
+        tehai_div.style.zIndex = "1";
+        tehai_makeprob_div.style.zIndex = "0";
+        //状態テキストの変更
+        changeStateText("待ち牌を選択してください");
+
+        //通常モードに変更
+        mode = Mode.normal;
+
+        //字牌の刻子を0個にする
+        let radio_jihai_0 = document.getElementById('radio_jihai_0');
+        radio_jihai_0.checked = true;
+    }
 }
 
 //イベント登録（解答用ダイヤログの閉じるボタン）
@@ -737,5 +992,56 @@ function testMakeAppearMachi(num){
         if(machihai_list.length == num){
             break;
         }
+    }
+}
+
+//指定した牌姿を設定するテスト関数
+function testSetHaishi(haishi){
+    //長さが13の文字列のみ受け付ける
+    if(haishi.length == "13" && typeof(haishi) == "string"){
+        //手牌のリストのひな形を生成
+        let result_list = ScriptCore.createCountHaisBase();
+        for(let i = 0; i < haishi.length; i++){
+            let num = Number(haishi[i]);
+            if(num >= 1 && num <= 9){
+                result_list[0][num - 1]++;
+            }
+            //数字の1から9以外の場合除外
+            else{
+                return;
+            }
+        }
+
+        //同じ数字が4つ以上あった場合は除外
+        for(let i = 0; i < result_list[0].length; i++){
+            if(result_list[0][i] > 4){
+                return;
+            }
+        }
+
+        tehai_count = ScriptCore.copyArray(result_list);
+
+        //待ち牌選択用テーブルをリセット
+        btn_clear_click();
+        normalMaxHaiCell();
+        removeTehaiMarker();
+
+        //待ちのリストをリセット
+        machihai_list.length = 0;
+
+        //待ちのリストを生成
+        machihai_list = generateMachiList(tehai_count);
+
+        //4枚使われている牌のリスト
+        maxhai_list = generateMaxHaiList(tehai_count);
+
+        //手牌の画像を画面に挿入
+        insertTehaiImage(display_haishu);
+        //4枚使用されている牌のセルの画像を薄くする
+        thinMaxHaiCell();
+
+        //字牌の刻子を0個にする
+        let radio_jihai_0 = document.getElementById('radio_jihai_0');
+        radio_jihai_0.checked = true;
     }
 }

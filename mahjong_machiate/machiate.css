@@ -5,12 +5,25 @@ body{
 #state_text{
     text-align: center;
 }
-#tehai{
+#tehai_parent{
+    position: relative;
+}
+#tehai, #tehai_makeprob{
     display: flex;
-    justify-content: center;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%);
+}
+#tehai{
+    z-index: 1;
+}
+#tehai_makeprob{
+    z-index: 0;
 }
 
 #select_table{
+    padding-top: 100px;
     margin: 0 auto;
     border-spacing: 130px 50px;
 }
@@ -44,6 +57,9 @@ body{
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+#btnlist_makeprob{
+    display: none;
 }
 
 .modal{
