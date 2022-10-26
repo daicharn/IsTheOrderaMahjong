@@ -151,7 +151,7 @@ class ScriptCore{
                 result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count, machi_list));
             }
             //カンチャン（塔子）の処理
-            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
+            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1 && mentsu_count >= 3){
                 let copied_hais = this.copyArray(hais_count);
                 copied_hais[haishu][i % 9]--;
                 copied_hais[haishu][i % 9 + 2]--;
@@ -166,7 +166,7 @@ class ScriptCore{
                 result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count, machi_list));
             }
             //ペンチャン、両面の処理
-            if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1){
+            if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && mentsu_count >= 3){
                 let copied_hais = this.copyArray(hais_count);
                 copied_hais[haishu][i % 9]--;
                 copied_hais[haishu][i % 9 + 1]--;

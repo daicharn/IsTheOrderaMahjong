@@ -1045,3 +1045,14 @@ function testSetHaishi(haishi){
         radio_jihai_0.checked = true;
     }
 }
+
+//待ち牌計算にかかる時間を測定
+function testMeasureCalcMachihai(){
+    let tehai_count_test = generateTehai();
+    //時間の計測を開始
+    const startTime = Date.now();
+    let machihai_list_test = generateMachiList(tehai_count_test);
+    const endTime = Date.now();
+
+    return endTime - startTime;
+}
