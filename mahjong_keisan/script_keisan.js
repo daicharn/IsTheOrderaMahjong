@@ -528,9 +528,16 @@ function test_getAgariBlockResult(){
 
 //4面子1雀頭のシャンテン数を判定
 function calcIppanteShanten(haisCount){
+    //最初に待ちがあるかどうかを計算する（ここで待ちがある場合、聴牌とみなし0を返す）
+    ScriptCore.createMachihaiListRecursive(haisCount, 0, 0, 0, naki_pais_list.length, machihai_list);
+    if(machihai_list.length > 0){
+        return 0;
+    }
+
+    //待ちがなかった場合、シャンテン数を求める処理を行う
     //分解結果を記憶する変数
     let result_list = new Array(1);
-    result_list = ScriptCore.createTenpaiHaiBlocksRecursive(haisCount, 0, 0, 0, naki_pais_list.length, machihai_list);
+    result_list = ScriptCore.createTenpaiHaiBlocksRecursive(haisCount, 0, 0, 0, naki_pais_list.length);
     result_list = [...new Set(result_list.map(JSON.stringify))].map(JSON.parse);
 
     //最小のシャンテン数を探す

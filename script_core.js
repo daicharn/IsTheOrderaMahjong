@@ -90,14 +90,13 @@ class ScriptCore{
         return result_list;
     }
 
-    //再帰的に手牌をブロックとして分割（聴牌判定時のみ使用）
-    static createTenpaiHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count, naki_count, machi_list){
-        let result_list = [];
+    //再帰的に手牌から待ち牌を探す処理
+    static createMachihaiListRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count, naki_count, machi_list){
         for(let i = 0; i < PAI_TYPE_NUM; i++){
             let haishu = Math.floor(i / 9);
             let count = hais_count[haishu][i % 9];
             //雀頭、対子の処理（対子1以上かつ面子3以上　または　面子0かつ塔子0の時のみ対子を抜き出す）
-            if(count >= 2 && ((toitsu_count > 0 && mentsu_count >= 3) || (mentsu_count == 0 && taatsu_count == 0))){
+            if(count >= 2 && ((toitsu_count > 0 && mentsu_count + naki_count >= 3) || (mentsu_count == 0 && taatsu_count == 0))){
                 let copied_hais = this.copyArray(hais_count);
                 //面子が3枚で対子が2枚のシャンポン待ちの待ち牌をリストに追加
                 if(mentsu_count + naki_count >= 3 && toitsu_count >= 1){
@@ -110,7 +109,7 @@ class ScriptCore{
                 }
                 copied_hais[haishu][i % 9] -= 2;
                 //再帰呼び出し
-                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1, naki_count, machi_list));
+                this.createMachihaiListRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1, naki_count, machi_list);
             }
             //刻子の処理
             if(count >= 3){
@@ -126,7 +125,7 @@ class ScriptCore{
                     }
                 }
                 //再帰呼び出し
-                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count, machi_list))
+                this.createMachihaiListRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count, machi_list)
             }
             //字牌なら対子、刻子の処理のみで終了させる
             if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
@@ -148,10 +147,10 @@ class ScriptCore{
                     }
                 }
                 //再帰呼び出し
-                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count, machi_list));
+                this.createMachihaiListRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count, machi_list);
             }
             //カンチャン（塔子）の処理
-            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1 && mentsu_count >= 3){
+            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1 && mentsu_count + naki_count >= 3){
                 let copied_hais = this.copyArray(hais_count);
                 copied_hais[haishu][i % 9]--;
                 copied_hais[haishu][i % 9 + 2]--;
@@ -163,10 +162,10 @@ class ScriptCore{
                     }
                 }
                 //再帰呼び出し
-                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count, machi_list));
+                this.createMachihaiListRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count, machi_list);
             }
             //ペンチャン、両面の処理
-            if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && mentsu_count >= 3){
+            if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && mentsu_count + naki_count >= 3){
                 let copied_hais = this.copyArray(hais_count);
                 copied_hais[haishu][i % 9]--;
                 copied_hais[haishu][i % 9 + 1]--;
@@ -197,7 +196,59 @@ class ScriptCore{
                     }
                 }
                 //再帰呼び出し
-                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count, machi_list));
+                this.createMachihaiListRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count, machi_list);
+            }           
+        }
+    }
+
+    //再帰的に手牌をブロックとして分割（聴牌判定時のみ使用）
+    static createTenpaiHaiBlocksRecursive(hais_count, mentsu_count, taatsu_count, toitsu_count, naki_count){
+        let result_list = [];
+        for(let i = 0; i < PAI_TYPE_NUM; i++){
+            let haishu = Math.floor(i / 9);
+            let count = hais_count[haishu][i % 9];
+            //雀頭、対子の処理（対子1以上かつ面子3以上　または　面子0かつ塔子0の時のみ対子を抜き出す）
+            if(count >= 2 && ((toitsu_count > 0 && mentsu_count + naki_count >= 3) || (mentsu_count == 0 && taatsu_count == 0))){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9] -= 2;
+                //再帰呼び出し
+                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count, toitsu_count + 1, naki_count));
+            }
+            //刻子の処理
+            if(count >= 3){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9] -= 3;
+                //再帰呼び出し
+                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count))
+            }
+            //字牌なら対子、刻子の処理のみで終了させる
+            if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
+                continue;
+            }
+            //順子（面子）の処理
+            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9]--;
+                copied_hais[haishu][i % 9 + 1]--;
+                copied_hais[haishu][i % 9 + 2]--;
+                //再帰呼び出し
+                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count + 1, taatsu_count, toitsu_count, naki_count));
+            }
+            //カンチャン（塔子）の処理
+            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9]--;
+                copied_hais[haishu][i % 9 + 2]--;
+                //再帰呼び出し
+                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count));
+            }
+            //ペンチャン、両面の処理
+            if(i % 9 < 8 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9]--;
+                copied_hais[haishu][i % 9 + 1]--;
+                //再帰呼び出し
+                result_list = result_list.concat(this.createTenpaiHaiBlocksRecursive(copied_hais, mentsu_count, taatsu_count + 1, toitsu_count, naki_count));
             }           
         }
         //分解が終了したら結果を記憶する

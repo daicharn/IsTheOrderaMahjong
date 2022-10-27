@@ -563,7 +563,7 @@ function generateTehai9Men(){
 function generateMachiList(tehai_list){
     let result_list = [];
     //待ちの候補を取得する
-    ScriptCore.createTenpaiHaiBlocksRecursive(tehai_list, 0, 0, 0, 0, result_list);
+    ScriptCore.createMachihaiListRecursive(tehai_list, 0, 0, 0, 0, result_list);
     //4枚使われている牌は待ちから除外
     for(let i = 0; i < result_list.length; i++){
         if(tehai_list[0][result_list[i] - 1] >= 4){
@@ -957,15 +957,15 @@ document.onkeydown = (event) =>{
     }
     //スペースキーが押された時、解答を表示
     else if(event.key === " "){
-        //モーダルが開いているときは処理を行わない
-        if(!isModalOpen()){
+        //モーダルが開いているとき、問題作成モードの時は処理を行わない
+        if(!isModalOpen() && mode != Mode.makeprob){
             btn_answer_click();
         }
     }
     //エンターキーが押された時、次の問題へ
     else if(event.key === "Enter"){
-        //モーダルが開いているときは処理を行わない
-        if(!isModalOpen()){
+        //モーダルが開いているとき、問題作成モードの時は処理を行わない
+        if(!isModalOpen() && mode != Mode.makeprob){
             btn_next_click();
         }
     }
@@ -1050,9 +1050,9 @@ function testSetHaishi(haishi){
 function testMeasureCalcMachihai(){
     let tehai_count_test = generateTehai();
     //時間の計測を開始
-    const startTime = Date.now();
+    const startTime = performance.now();
     let machihai_list_test = generateMachiList(tehai_count_test);
-    const endTime = Date.now();
+    const endTime = performance.now();
 
     return endTime - startTime;
 }
