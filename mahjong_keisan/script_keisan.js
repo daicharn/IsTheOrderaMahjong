@@ -461,61 +461,14 @@ function generateKokushi13Tehai(){
     return haisCount;
 }
 
-//再帰的にアガリ牌をブロックとして分割してブロックを返す
-function createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, tehai_list){
-    let result_list = [];
-    for(let i = 0; i < PAI_TYPE_NUM; i++){
-        let haishu = Math.floor(i / 9);
-        let count = hais_count[haishu][i % 9];
-        //雀頭、対子の処理
-        if(count >= 2){
-            let copied_hais = ScriptCore.copyArray(hais_count);
-            copied_hais[haishu][i % 9] -= 2;
-            let tehai_list_new = ScriptCore.copyArray(tehai_list);
-            tehai_list_new.push([i + 1, i + 1]);
-            //再帰呼び出し
-            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count, toitsu_count + 1, tehai_list_new));
-        }
-        //刻子の処理
-        if(count >= 3){
-            let copied_hais = ScriptCore.copyArray(hais_count);
-            copied_hais[haishu][i % 9] -= 3;
-            let tehai_list_new = ScriptCore.copyArray(tehai_list);
-            tehai_list_new.push([i + 1, i + 1, i + 1]);
-            //再帰呼び出し
-            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
-        }
-
-        //字牌なら対子、刻子の処理のみで終了させる
-        if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
-            continue;
-        }
-
-        //順子（面子）の処理
-        if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
-            let copied_hais = ScriptCore.copyArray(hais_count);
-            copied_hais[haishu][i % 9]--;
-            copied_hais[haishu][i % 9 + 1]--;
-            copied_hais[haishu][i % 9 + 2]--;
-            let tehai_list_new = ScriptCore.copyArray(tehai_list);
-            tehai_list_new.push([i + 1, i + 2, i + 3]);
-            //再帰呼び出し
-            result_list = result_list.concat(createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, tehai_list_new));
-        }
-    }
-    //分割完了時、4面子1雀頭または対子が7つまたは国士無双であればリストに追加
-    if((mentsu_count + naki_pais_list.length == 4 && toitsu_count == 1) || toitsu_count == 7){
-        result_list.push(tehai_list.sort());
-    }
-
-    return result_list;
-}
-
 //テスト（分解結果を返す）
 function test_getAgariBlockResult(){
     let hais_count = countHais();
     let result_list = new Array(1);
-    result_list = createAgariHaiBlocksRecursive(hais_count, 0, 0, []);
+    let startTime = performance.now();
+    result_list = ScriptCore.createAgariHaiBlocksRecursive(hais_count, 0, 0, naki_pais_list.length, []);
+    let endTime = performance.now();
+    console.log(endTime - startTime);
     result_list = [...new Set(result_list.map(JSON.stringify))].map(JSON.parse);
 
     for(let i = 0; i < result_list.length; i++){
@@ -2670,7 +2623,7 @@ function calcAgari(agari_kata){
     //4面子1雀頭または七対子型のアガリの場合
     else{
         let hais_count = countHais();
-        agari_lists = createAgariHaiBlocksRecursive(hais_count, 0, 0, []);
+        agari_lists = ScriptCore.createAgariHaiBlocksRecursive(hais_count, 0, 0, naki_pais_list.length, []);
         agari_lists = [...new Set(agari_lists.map(JSON.stringify))].map(JSON.parse);
     
         for(let i = 0; i < agari_lists.length; i++){

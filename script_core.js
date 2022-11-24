@@ -258,4 +258,54 @@ class ScriptCore{
 
         return result_list;
     }
+
+    //再帰的にアガリ牌をブロックに分割して返す
+    static createAgariHaiBlocksRecursive(hais_count, mentsu_count, toitsu_count, naki_count, tehai_list){
+        let result_list = [];
+        for(let i = 0; i < PAI_TYPE_NUM; i++){
+            let haishu = Math.floor(i / 9);
+            let count = hais_count[haishu][i % 9];
+            //雀頭、対子の処理（面子0の時のみ対子を抜き出す）
+            if(count >= 2 && mentsu_count == 0){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9] -= 2;
+                let tehai_list_new = this.copyArray(tehai_list);
+                tehai_list_new.push([i + 1, i + 1]);
+                //再帰呼び出し
+                result_list = result_list.concat(this.createAgariHaiBlocksRecursive(copied_hais, mentsu_count, toitsu_count + 1, naki_count, tehai_list_new));
+            }
+            //刻子の処理
+            if(count >= 3){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9] -= 3;
+                let tehai_list_new = this.copyArray(tehai_list);
+                tehai_list_new.push([i + 1, i + 1, i + 1]);
+                //再帰呼び出し
+                result_list = result_list.concat(this.createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, naki_count, tehai_list_new));
+            }
+
+            //字牌なら対子、刻子の処理のみで終了させる
+            if(i + 1 >= JIHAI[0] && i + 1 <= JIHAI[6]){
+                continue;
+            }
+
+            //順子（面子）の処理
+            if(i % 9 < 7 && count >= 1 && hais_count[haishu][i % 9 + 1] >= 1 && hais_count[haishu][i % 9 + 2] >= 1){
+                let copied_hais = this.copyArray(hais_count);
+                copied_hais[haishu][i % 9]--;
+                copied_hais[haishu][i % 9 + 1]--;
+                copied_hais[haishu][i % 9 + 2]--;
+                let tehai_list_new = this.copyArray(tehai_list);
+                tehai_list_new.push([i + 1, i + 2, i + 3]);
+                //再帰呼び出し
+                result_list = result_list.concat(this.createAgariHaiBlocksRecursive(copied_hais, mentsu_count + 1, toitsu_count, naki_count, tehai_list_new));
+            }
+        }
+        //分割完了時、4面子1雀頭または対子が7つであればリストに追加
+        if((mentsu_count + naki_count == 4 && toitsu_count == 1) || toitsu_count == 7){
+            result_list.push(tehai_list.sort());
+        }
+
+        return result_list;
+    }   
 }
