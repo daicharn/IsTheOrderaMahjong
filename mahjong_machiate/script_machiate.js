@@ -790,6 +790,7 @@ function btn_cancel_makeprob_click(){
 }
 //問題作成中の決定ボタンが押された時
 function btn_enter_makeprob_click(){
+    //手牌が13枚入力されているとき
     if(tehai_list_makeprob.length >= TEHAI_NUMBER - 1){
         //手牌のリストから手牌の配列を作成
         let tehai_count_makeprob = ScriptCore.createCountHaisBase();
@@ -800,17 +801,17 @@ function btn_enter_makeprob_click(){
         //待ちのリストを仮生成
         machihai_list_temp = generateMachiList(tehai_count_makeprob);
 
-        //確認ダイヤログを表示する
-        if(!confirm("現在の問題は消去されますがよろしいでしょうか。")){
-            return;
-        }
-
         //待ち牌が一枚も存在しない場合は追加の確認ダイアログを表示する
         if(machihai_list_temp.length === 0){
             //キャンセルが押された場合問題の作成を中止
             if(!confirm("待ち牌が一枚も存在しませんが問題を作成してよろしいでしょうか。")){
                 return;
             }
+        }
+
+        //確認ダイヤログを表示する
+        if(!confirm("現在の問題は消去されますがよろしいでしょうか。")){
+            return;
         }
 
         //以下、問題作成の処理
@@ -852,6 +853,10 @@ function btn_enter_makeprob_click(){
         //字牌の刻子を0個にする
         let radio_jihai_0 = document.getElementById('radio_jihai_0');
         radio_jihai_0.checked = true;
+    }
+    //手牌が13枚ない場合
+    else{
+        alert("手牌を13枚入力してください。");
     }
 }
 
@@ -950,6 +955,10 @@ document.onkeydown = (event) =>{
         else if(modal_setting.style.display == "block"){
             modalSettingClose();
         }
+        //問題作成モードの時はキャンセルボタンを押す処理を行う
+        else if(mode == Mode.makeprob){
+            btn_cancel_makeprob_click();
+        }
         //通常時は選択した牌をクリア
         else{
             btn_clear_click();
@@ -967,6 +976,10 @@ document.onkeydown = (event) =>{
         //モーダルが開いているとき、問題作成モードの時は処理を行わない
         if(!isModalOpen() && mode != Mode.makeprob){
             btn_next_click();
+        }
+        //問題作成モードの時は決定ボタンを押す処理を行う
+        else if(mode == Mode.makeprob){
+            btn_enter_makeprob_click();
         }
     }
 }
@@ -1051,7 +1064,7 @@ function testMeasureCalcMachihai(){
     let tehai_count_test = generateTehai();
     //時間の計測を開始
     const startTime = performance.now();
-    let machihai_list_test = generateMachiList(tehai_count_test);
+    generateMachiList(tehai_count_test);
     const endTime = performance.now();
 
     return endTime - startTime;
