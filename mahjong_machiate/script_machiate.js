@@ -197,6 +197,8 @@ insertTehaiImage(display_haishu);
 insertImgSelectTable(display_haishu);
 //4枚使用されている牌のセルの画像を薄くする
 thinMaxHaiCell();
+//実際の解答をモーダルに表示
+viewTrueAnswerOnModal();
 
 //問題作成用の手牌の画像の設定
 function setTehaimakeprobimg(i, src){
@@ -636,19 +638,14 @@ function clearSelectCellsflg(){
     }
 }
 
-//クリアボタンが押された時
-function btn_clear_click(){
-    clearSelectCellsImg();
-    clearSelectCellsflg();
-}
-//解答ボタンが表示された時
-function btn_answer_click(){
-    //実際の解答をモーダルに表示
-    let true_answer_p = document.createElement('p');
-    true_answer_p.innerText = "実際の解答 ";
-    true_answer_p.style.fontWeight = "bold";
-    let true_answer_div = document.createElement('div');
-    true_answer_div.style.display = "flex";
+//実際の解答をモーダルに表示
+function viewTrueAnswerOnModal(){
+    let true_answer_div = document.getElementById('true_answer_div');
+    //削除処理
+    while(true_answer_div.firstChild){
+        true_answer_div.removeChild(true_answer_div.firstChild);
+    }
+    //追加処理
     for(let i = 0; i < machihai_list.length; i++){
         //現段階では4枚以上ある牌を隠す
         if(!maxhai_list.includes(machihai_list[i])){
@@ -659,18 +656,11 @@ function btn_answer_click(){
             true_answer_div.appendChild(div_element);
         }
     }
-    modal_answer_body.appendChild(true_answer_p);
-    modal_answer_body.appendChild(true_answer_div);
-    //待ちの数と受け入れ枚数を表示
-    let ukeire_p = document.createElement('p');
-    ukeire_p.innerText = "（" + machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
-    modal_answer_body.appendChild(ukeire_p);
-    //ユーザの解答をモーダルに表示
-    let user_answer_p = document.createElement('p');
-    user_answer_p.innerText = "あなたの回答";
-    user_answer_p.style.fontWeight = "bold";
-    let user_answer_div = document.createElement('div');
-    user_answer_div.style.display = "flex";
+}
+
+//ユーザの回答をモーダルに表示
+function viewUserAnswerOnModal(){
+    let user_answer_div = document.getElementById('user_answer_div');
     //一つもテーブルが選択されていなければ未回答と表示
     if(select_flgs.every(value => value == false)){
         let no_answer_p = document.createElement('p');
@@ -692,10 +682,27 @@ function btn_answer_click(){
             }
         }
     }
+    //受け入れ枚数の表示
+    let ukeire_p = document.getElementById('ukeire_p');
+    ukeire_p.innerText = "（" + machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
+}
+//ユーザの回答をモーダルから削除
+function deleteUserAnswerOnModal(){
+    let user_answer_div = document.getElementById('user_answer_div');
+    while(user_answer_div.firstChild){
+        user_answer_div.removeChild(user_answer_div.firstChild);
+    }
+}
 
-    modal_answer_body.appendChild(user_answer_p);
-    modal_answer_body.appendChild(user_answer_div);
-
+//クリアボタンが押された時
+function btn_clear_click(){
+    clearSelectCellsImg();
+    clearSelectCellsflg();
+}
+//解答ボタンが押された時
+function btn_answer_click(){
+    //ユーザの回答をモーダルに表示
+    viewUserAnswerOnModal();
     //モーダルを表示
     modal_answer.style.display = "block";
 }
@@ -722,6 +729,8 @@ function btn_next_click(){
     insertTehaiImage(display_haishu);
     //4枚使用されている牌のセルの画像を薄くする
     thinMaxHaiCell();
+    //実際の解答をモーダルに表示
+    viewTrueAnswerOnModal();
 }
 //牌種の変更ボタンが押された時
 function btn_haishu_click(){
@@ -849,6 +858,8 @@ function btn_enter_makeprob_click(){
         insertTehaiImage(display_haishu);
         //4枚使用されている牌のセルの画像を薄くする
         thinMaxHaiCell();
+        //実際の解答をモーダルに表示
+        viewTrueAnswerOnModal();
 
         //テーブルのフラグを削除する
         clearSelectCellsflg();
@@ -923,9 +934,7 @@ addEventListener("click", (event) =>{
 });
 //解答用ダイヤログが閉じたときの処理
 function modalAnswerClose(){
-    while(modal_answer_body.firstChild){
-        modal_answer_body.removeChild(modal_answer_body.firstChild);
-    }
+    deleteUserAnswerOnModal();
     modal_answer.style.display = "none";
 }
 //牌種選択用ダイヤログが閉じたときの処理
@@ -1071,6 +1080,8 @@ function testSetHaishi(haishi){
         insertTehaiImage(display_haishu);
         //4枚使用されている牌のセルの画像を薄くする
         thinMaxHaiCell();
+        //実際の解答をモーダルに表示
+        viewTrueAnswerOnModal();
 
         //字牌の刻子を0個にする
         let radio_jihai_0 = document.getElementById('radio_jihai_0');
