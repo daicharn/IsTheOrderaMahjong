@@ -632,8 +632,8 @@ function calc_shanten(){
         chitoitsu_shanten = ScriptCore.calcChiitoiShanten(hais_count);
         //七対子のシャンテン数が0の時、待ちを求める
         if(chitoitsu_shanten == 0){
-            machi = ScriptCore.searchChiitoiMachi(hais_count);
-            machihai_list.push(machi);
+            let machi_chiitoi = ScriptCore.searchChiitoiMachi(hais_count);
+            machihai_list.push(machi_chiitoi);
         }
     }
 

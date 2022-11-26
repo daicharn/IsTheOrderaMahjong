@@ -562,8 +562,15 @@ function generateTehai9Men(){
 //待ち牌のリストの生成
 function generateMachiList(tehai_list){
     let result_list = [];
-    //待ちの候補を取得する
+    //待ちの候補を取得する（一般手について）
     ScriptCore.createMachihaiListRecursive(tehai_list, 0, 0, 0, 0, result_list);
+    //七対子の場合の待ちについても取得
+    if(ScriptCore.calcChiitoiShanten(tehai_list) == 0){
+        let machi_chiitoi = ScriptCore.searchChiitoiMachi(tehai_list);
+        if(!result_list.includes(machi_chiitoi)){
+            result_list.push(machi_chiitoi);
+        }
+    }
     //4枚使われている牌は待ちから除外
     for(let i = 0; i < result_list.length; i++){
         if(tehai_list[0][result_list[i] - 1] >= 4){
