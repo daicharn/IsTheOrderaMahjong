@@ -303,9 +303,51 @@ class ScriptCore{
         }
         //分割完了時、4面子1雀頭または対子が7つであればリストに追加
         if((mentsu_count + naki_count == 4 && toitsu_count == 1) || toitsu_count == 7){
-            result_list.push(tehai_list.sort());
+            result_list.push(tehai_list.sort());     
         }
 
         return result_list;
-    }   
+    }
+
+    //七対子のシャンテン数を判定
+    static calcChiitoiShanten(haisCount){
+        let toitsu_count = 0;
+        let haishu_count = 0;
+        let copied_hais = ScriptCore.copyArray(haisCount);
+
+        for(let i = 0; i < copied_hais.length; i++){
+            for(let j = 0; j < copied_hais[i].length; j++){
+                //1枚でもあれば牌の種類としてカウント
+                if(copied_hais[i][j] >= 1){
+                    haishu_count++;
+                }
+                //2枚以上あれば対子としてカウント
+                if(copied_hais[i][j] >= 2){
+                    toitsu_count++;
+                    copied_hais[i][j] -= 2;
+                }
+            }
+        }
+
+        let shanten = 6 - toitsu_count;
+        //牌の種類と対子の数が7種類未満のとき
+        if(toitsu_count < 7 && haishu_count < 7){
+            //7 - 牌の種類の数をシャンテン数に加算する
+            shanten += 7 - haishu_count;
+        }
+
+        return shanten;
+    }
+
+    //七対子の待ちを求める(七対子シャンテン数が0の場合を前提として使用)
+    static searchChiitoiMachi(haisCount){
+        for(let i = 0; i < haisCount.length; i++){
+            for(let j = 0; j < haisCount[i].length; j++){
+                //1枚だけ孤立している牌が待ちになる
+                if(haisCount[i][j] == 1){
+                    return i * 9 + j + 1;
+                }
+            }
+        }
+    }
 }

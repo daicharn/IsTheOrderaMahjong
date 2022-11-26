@@ -615,44 +615,6 @@ function calcKokushiShanten(haisCount){
     return shanten;
 }
 
-//七対子のシャンテン数を判定
-function calcChiitoiShanten(haisCount){
-    let toitsu_count = 0;
-    let haishu_count = 0;
-    let copied_hais = ScriptCore.copyArray(haisCount);
-
-    for(let i = 0; i < copied_hais.length; i++){
-        for(let j = 0; j < copied_hais[i].length; j++){
-            //1枚でもあれば牌の種類としてカウント
-            if(copied_hais[i][j] >= 1){
-                haishu_count++;
-            }
-            //2枚以上あれば対子としてカウント
-            if(copied_hais[i][j] >= 2){
-                toitsu_count++;
-                copied_hais[i][j] -= 2;
-            }
-        }
-    }
-
-    let shanten = 6 - toitsu_count;
-    //牌の種類と対子の数が7種類未満のとき
-    if(toitsu_count < 7 && haishu_count < 7){
-        //7 - 牌の種類の数をシャンテン数に加算する
-        shanten += 7 - haishu_count;
-    }
-
-    //聴牌であれば待ち牌を求めてリストに挿入
-    if(shanten == 0){
-        let machihai = ScriptCore.searchNokoriHai(copied_hais)[0];
-        if(!machihai_list.includes(machihai)){
-            machihai_list.push(machihai);
-        }
-    }
-
-    return shanten;
-}
-
 //現在のシャンテン数を計算する
 function calc_shanten(){
     let hais_count = countHais();
@@ -667,7 +629,12 @@ function calc_shanten(){
     //以下の2つについてはあらゆる鳴きがない場合のみ計算する
     if(naki_pais_list.length == 0){
         kokushi_shanten = calcKokushiShanten(hais_count);
-        chitoitsu_shanten = calcChiitoiShanten(hais_count);
+        chitoitsu_shanten = ScriptCore.calcChiitoiShanten(hais_count);
+        //七対子のシャンテン数が0の時、待ちを求める
+        if(chitoitsu_shanten == 0){
+            machi = ScriptCore.searchChiitoiMachi(hais_count);
+            machihai_list.push(machi);
+        }
     }
 
     //国士無双聴牌以外の場合、一般手のシャンテン数を求める
@@ -2649,7 +2616,7 @@ function calcAgari(agari_kata){
 
             //対子が7個の形の場合は七対子かどうか判別する
             if(agari_lists[i].length == 7){
-                if(calcChiitoiShanten(countHais()) == -1){
+                if(ScriptCore.calcChiitoiShanten(countHais()) == -1){
                     //役満の場合は七対子を付けない
                     if(isTenho() || isChiho() || isTsuiso(agari_lists[i])){
                         if(isTenho()){
