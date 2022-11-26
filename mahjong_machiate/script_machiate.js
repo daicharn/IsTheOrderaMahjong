@@ -24,15 +24,16 @@ const Mode = {
 let tehai_count = generateTehai();
 //待ちのリスト
 let machihai_list = generateMachiList(tehai_count);
+//4枚使われている牌のリスト
+let maxhai_list = generateMaxHaiList(tehai_count);
 //待ちが0枚だった場合は再生成
-while(machihai_list.length == 0){
+while(machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length == 0){
     tehai_count = generateTehai();
-    machihai_list = generateMachiList(tehai_count);    
+    machihai_list = generateMachiList(tehai_count);
+    maxhai_list = generateMaxHaiList(tehai_count);
 }
 //問題作成用の手牌のリスト
 let tehai_list_makeprob = [];
-//4枚使われている牌のリスト
-let maxhai_list = generateMaxHaiList(tehai_count);
 
 //テーブルの選択フラグ
 let select_flgs = new Array(9).fill(false);
@@ -571,13 +572,10 @@ function generateMachiList(tehai_list){
             result_list.push(machi_chiitoi);
         }
     }
-    //4枚使われている牌は待ちから除外
-    for(let i = 0; i < result_list.length; i++){
-        if(tehai_list[0][result_list[i] - 1] >= 4){
-            let hai_index = result_list.indexOf(result_list[i]);
-            result_list.splice(hai_index, 1);
-        }
-    }
+
+    //テスト（4枚使っている牌を除外する）
+    //result_list = result_list.filter(i => generateMaxHaiList(tehai_list).indexOf(i) == -1);
+
     //ソートする
     result_list.sort();
 
@@ -652,17 +650,20 @@ function btn_answer_click(){
     let true_answer_div = document.createElement('div');
     true_answer_div.style.display = "flex";
     for(let i = 0; i < machihai_list.length; i++){
-        let div_element = document.createElement('div');
-        let img_element = document.createElement('img');
-        img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + machihai_list[i]);
-        div_element.appendChild(img_element);
-        true_answer_div.appendChild(div_element);
+        //現段階では4枚以上ある牌を隠す
+        if(!maxhai_list.includes(machihai_list[i])){
+            let div_element = document.createElement('div');
+            let img_element = document.createElement('img');
+            img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + machihai_list[i]);
+            div_element.appendChild(img_element);
+            true_answer_div.appendChild(div_element);
+        }
     }
     modal_answer_body.appendChild(true_answer_p);
     modal_answer_body.appendChild(true_answer_div);
     //待ちの数と受け入れ枚数を表示
     let ukeire_p = document.createElement('p');
-    ukeire_p.innerText = "（" + machihai_list.length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
+    ukeire_p.innerText = "（" + machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
     modal_answer_body.appendChild(ukeire_p);
     //ユーザの解答をモーダルに表示
     let user_answer_p = document.createElement('p');
@@ -670,15 +671,28 @@ function btn_answer_click(){
     user_answer_p.style.fontWeight = "bold";
     let user_answer_div = document.createElement('div');
     user_answer_div.style.display = "flex";
-    for(let i = 0; i < select_flgs.length; i++){
-        if(select_flgs[i]){
-            let div_element = document.createElement('div');
-            let img_element = document.createElement('img');
-            img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + i + 1);
-            div_element.appendChild(img_element);
-            user_answer_div.appendChild(div_element);
+    //一つもテーブルが選択されていなければ未回答と表示
+    if(select_flgs.every(value => value == false)){
+        let no_answer_p = document.createElement('p');
+        no_answer_p.innerText = "未回答";
+        no_answer_p.style.fontSize = 20;
+        no_answer_p.style.marginTop = 0;
+        no_answer_p.style.marginBottom = 10;
+        user_answer_div.appendChild(no_answer_p);
+    }
+    //解答があった場合はその牌を表示
+    else{
+        for(let i = 0; i < select_flgs.length; i++){
+            if(select_flgs[i]){
+                let div_element = document.createElement('div');
+                let img_element = document.createElement('img');
+                img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + i + 1);
+                div_element.appendChild(img_element);
+                user_answer_div.appendChild(div_element);
+            }
         }
     }
+
     modal_answer_body.appendChild(user_answer_p);
     modal_answer_body.appendChild(user_answer_div);
 
@@ -696,15 +710,14 @@ function btn_next_click(){
     machihai_list.length = 0;
 
     //新しい手牌と待ちを再度生成
-    while(machihai_list.length == 0){
+    while(machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length == 0){
         //手牌
         tehai_count = generateTehai();
         //待ちのリスト
         machihai_list = generateMachiList(tehai_count);
+        //4枚使われている牌のリスト
+        maxhai_list = generateMaxHaiList(tehai_count);
     }
-    //4枚使われている牌のリスト
-    maxhai_list = generateMaxHaiList(tehai_count);
-
     //手牌の画像を画面に挿入
     insertTehaiImage(display_haishu);
     //4枚使用されている牌のセルの画像を薄くする
@@ -807,9 +820,11 @@ function btn_enter_makeprob_click(){
 
         //待ちのリストを仮生成
         machihai_list_temp = generateMachiList(tehai_count_makeprob);
+        //4枚存在する牌を除去した待ちのリスト
+        machihai_list_true = machihai_list_temp.filter(i => generateMaxHaiList(tehai_count_makeprob).indexOf(i) == -1)
 
         //待ち牌が一枚も存在しない場合は追加の確認ダイアログを表示する
-        if(machihai_list_temp.length === 0){
+        if(machihai_list_true.length === 0){
             //キャンセルが押された場合問題の作成を中止
             if(!confirm("待ち牌が一枚も存在しませんが問題を作成してよろしいでしょうか。")){
                 return;
@@ -826,7 +841,7 @@ function btn_enter_makeprob_click(){
         //手牌のマーカーを消去
         removeTehaiMarker();
 
-        //仮作成した待ちのリストを使用
+        //仮作成した待ちのリストを使用（4枚を除去していないもの）
         machihai_list = machihai_list_temp.slice();
         //4枚使われている牌のリスト
         maxhai_list = generateMaxHaiList(tehai_count);
@@ -995,10 +1010,7 @@ document.onkeydown = (event) =>{
 function testGenerateMachi(num){
     let result_list = [];
     for(let i = 0; i < num; i++){
-        let machi = 0
-        while(machi == 0){
-            machi = generateMachiList(generateTehai()).length;
-        }
+        let machi = generateMachiList(generateTehai()).length;
         result_list.push(machi);
     }
 
@@ -1064,6 +1076,27 @@ function testSetHaishi(haishi){
         let radio_jihai_0 = document.getElementById('radio_jihai_0');
         radio_jihai_0.checked = true;
     }
+}
+
+//受け入れ枚数が0枚の手牌を生成
+function testGenerateNonMachitehai(){
+    let tehai_count_test = generateTehai();
+    let machihai_list_test = generateMachiList(tehai_count_test);
+    let maxhai_list_test = generateMaxHaiList(tehai_count_test);
+    while(machihai_list_test.filter(i => maxhai_list_test.indexOf(i) == -1).length != 0){
+        tehai_count_test = generateTehai();
+        machihai_list_test = generateMachiList(tehai_count_test);
+        maxhai_list_test = generateMaxHaiList(tehai_count_test);
+    }
+
+    let tehai_str = "";
+    for(let i = 0; i < tehai_count_test[0].length; i++){
+        for(let j = 0; j < tehai_count_test[0][i]; j++){
+                tehai_str += (i + 1).toString();
+        }
+    }
+
+    return tehai_str;
 }
 
 //待ち牌計算にかかる時間を測定
