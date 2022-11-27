@@ -102,6 +102,15 @@ body{
     color: black;
 }
 
+#label_checkbox_maxhai{
+    display: block;
+    margin: auto 0 0 30px;
+}
+#checkbox_maxhai{
+    transform: scale(1.5);
+    margin-left: 10px;
+}
+
 #haishu_radios{
     text-align: center;
     margin: 20px 0;

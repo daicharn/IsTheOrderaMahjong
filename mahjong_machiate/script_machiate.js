@@ -197,8 +197,6 @@ insertTehaiImage(display_haishu);
 insertImgSelectTable(display_haishu);
 //4枚使用されている牌のセルの画像を薄くする
 thinMaxHaiCell();
-//実際の解答をモーダルに表示
-viewTrueAnswerOnModal();
 
 //問題作成用の手牌の画像の設定
 function setTehaimakeprobimg(i, src){
@@ -647,20 +645,30 @@ function viewTrueAnswerOnModal(){
     }
     //追加処理
     for(let i = 0; i < machihai_list.length; i++){
-        //現段階では4枚以上ある牌を隠す
-        if(!maxhai_list.includes(machihai_list[i])){
-            let div_element = document.createElement('div');
-            let img_element = document.createElement('img');
-            img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + machihai_list[i]);
-            div_element.appendChild(img_element);
-            true_answer_div.appendChild(div_element);
+        let div_element = document.createElement('div');
+        let img_element = document.createElement('img');
+        img_element.src = ScriptCore.generate_pai_src(display_haishu * 9 + machihai_list[i]);
+        //4枚以上で受け入れのない待ちは透明化して表示
+        if(maxhai_list.includes(machihai_list[i])){
+            img_element.style.opacity = 0.4;
+            img_element.className = "answer_maxhai_img";
+            //このとき受け入れ0のチェックボックスがOFFになっていたら牌を非表示にしておく
+            if(!document.getElementById('checkbox_maxhai').checked){
+                img_element.style.display = "none";
+            }
         }
+        div_element.appendChild(img_element);
+        true_answer_div.appendChild(div_element);
     }
 }
 
 //ユーザの回答をモーダルに表示
 function viewUserAnswerOnModal(){
     let user_answer_div = document.getElementById('user_answer_div');
+    //削除処理
+    while(user_answer_div.firstChild){
+        user_answer_div.removeChild(user_answer_div.firstChild);
+    }
     //一つもテーブルが選択されていなければ未回答と表示
     if(select_flgs.every(value => value == false)){
         let no_answer_p = document.createElement('p');
@@ -686,13 +694,6 @@ function viewUserAnswerOnModal(){
     let ukeire_p = document.getElementById('ukeire_p');
     ukeire_p.innerText = "（" + machihai_list.filter(i => maxhai_list.indexOf(i) == -1).length.toString() + "種" + getUkeireMaisuu().toString() + "牌）";
 }
-//ユーザの回答をモーダルから削除
-function deleteUserAnswerOnModal(){
-    let user_answer_div = document.getElementById('user_answer_div');
-    while(user_answer_div.firstChild){
-        user_answer_div.removeChild(user_answer_div.firstChild);
-    }
-}
 
 //クリアボタンが押された時
 function btn_clear_click(){
@@ -701,6 +702,8 @@ function btn_clear_click(){
 }
 //解答ボタンが押された時
 function btn_answer_click(){
+    //実際の解答をモーダルに表示
+    viewTrueAnswerOnModal();
     //ユーザの回答をモーダルに表示
     viewUserAnswerOnModal();
     //モーダルを表示
@@ -729,8 +732,6 @@ function btn_next_click(){
     insertTehaiImage(display_haishu);
     //4枚使用されている牌のセルの画像を薄くする
     thinMaxHaiCell();
-    //実際の解答をモーダルに表示
-    viewTrueAnswerOnModal();
 }
 //牌種の変更ボタンが押された時
 function btn_haishu_click(){
@@ -858,8 +859,6 @@ function btn_enter_makeprob_click(){
         insertTehaiImage(display_haishu);
         //4枚使用されている牌のセルの画像を薄くする
         thinMaxHaiCell();
-        //実際の解答をモーダルに表示
-        viewTrueAnswerOnModal();
 
         //テーブルのフラグを削除する
         clearSelectCellsflg();
@@ -934,7 +933,6 @@ addEventListener("click", (event) =>{
 });
 //解答用ダイヤログが閉じたときの処理
 function modalAnswerClose(){
-    deleteUserAnswerOnModal();
     modal_answer.style.display = "none";
 }
 //牌種選択用ダイヤログが閉じたときの処理
@@ -1015,6 +1013,20 @@ document.onkeydown = (event) =>{
     }
 }
 
+//受け入れ枚数が0枚の牌を表示するかどうかのチェックボックスイベント
+let checkbox_maxhai = document.getElementById('checkbox_maxhai');
+checkbox_maxhai.addEventListener('change', () =>{
+    let answer_maxhai_imgs = Array.from(document.getElementsByClassName('answer_maxhai_img'));
+    //チェックボックスがONになった場合
+    if(checkbox_maxhai.checked){
+        answer_maxhai_imgs.forEach((elem) => elem.style.display = "block");
+    }
+    //チェックボックスがOFFになった場合
+    else{
+        answer_maxhai_imgs.forEach((elem) => elem.style.display = "none");
+    }
+});
+
 //生成される待ちの個数のテスト
 function testGenerateMachi(num){
     let result_list = [];
@@ -1080,8 +1092,6 @@ function testSetHaishi(haishi){
         insertTehaiImage(display_haishu);
         //4枚使用されている牌のセルの画像を薄くする
         thinMaxHaiCell();
-        //実際の解答をモーダルに表示
-        viewTrueAnswerOnModal();
 
         //字牌の刻子を0個にする
         let radio_jihai_0 = document.getElementById('radio_jihai_0');
@@ -1108,6 +1118,34 @@ function testGenerateNonMachitehai(){
     }
 
     return tehai_str;
+}
+
+//全てのアガリパターンを出力
+function testOutputAllAgariPattern(){
+    let tehai_count_test = ScriptCore.copyArray(tehai_count);
+    let machihai_list_true_test = machihai_list.filter((i) => maxhai_list.indexOf(i) == -1);
+    machihai_list_true_test.forEach((i) => {
+        tehai_count_test[0][i - 1]++;
+        console.log("-----" + i + "-----");
+        let tehai_lists = [...new Set(ScriptCore.createAgariHaiBlocksRecursive(tehai_count_test, 0, 0, 0, []).map(JSON.stringify))].map(JSON.parse);
+        let tehai_lists_str = "";
+        for(let i = 0; i < tehai_lists.length; i++){
+            tehai_lists_str += "[";
+            for(let j = 0; j < tehai_lists[i].length; j++){
+                if(tehai_lists[i][j].length == 2) tehai_lists_str += "[";
+                else tehai_lists_str += "(";
+                for(let k = 0; k < tehai_lists[i][j].length; k++){
+                    tehai_lists_str += tehai_lists[i][j][k].toString();
+                    if(k != tehai_lists[i][j].length - 1) tehai_lists_str += ",";
+                }
+                if(tehai_lists[i][j].length == 2) tehai_lists_str += "]";
+                else tehai_lists_str += ")";
+            }
+            tehai_lists_str += "]\n";
+        }
+        console.log(tehai_lists_str);
+        tehai_count_test[0][i - 1]--;
+    });
 }
 
 //待ち牌計算にかかる時間を測定
