@@ -1099,6 +1099,23 @@ function testSetHaishi(haishi){
     }
 }
 
+//手牌を文字列化するテスト関数
+function testTehaiToString(tehai){
+    let tehai_str = "";
+    for(let i = 0; i < tehai[0].length; i++){
+        for(let j = 0; j < tehai[0][i]; j++){
+                tehai_str += (i + 1).toString();
+        }
+    }
+
+    return tehai_str;
+}
+
+//現在の手牌を文字列化して返すテスト関数
+function testCurrentTehaiToString(){
+    return testTehaiToString(tehai_count);
+}
+
 //受け入れ枚数が0枚の手牌を生成
 function testGenerateNonMachitehai(){
     let tehai_count_test = generateTehai();
@@ -1110,14 +1127,7 @@ function testGenerateNonMachitehai(){
         maxhai_list_test = generateMaxHaiList(tehai_count_test);
     }
 
-    let tehai_str = "";
-    for(let i = 0; i < tehai_count_test[0].length; i++){
-        for(let j = 0; j < tehai_count_test[0][i]; j++){
-                tehai_str += (i + 1).toString();
-        }
-    }
-
-    return tehai_str;
+    return testTehaiToString(tehai_count_test);
 }
 
 //全てのアガリパターンを出力
@@ -1134,10 +1144,7 @@ function testOutputAllAgariPattern(){
             for(let j = 0; j < tehai_lists[i].length; j++){
                 if(tehai_lists[i][j].length == 2) tehai_lists_str += "[";
                 else tehai_lists_str += "(";
-                for(let k = 0; k < tehai_lists[i][j].length; k++){
-                    tehai_lists_str += tehai_lists[i][j][k].toString();
-                    if(k != tehai_lists[i][j].length - 1) tehai_lists_str += ",";
-                }
+                tehai_lists_str += tehai_lists[i][j].join();
                 if(tehai_lists[i][j].length == 2) tehai_lists_str += "]";
                 else tehai_lists_str += ")";
             }
