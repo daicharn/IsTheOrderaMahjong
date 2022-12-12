@@ -1,0 +1,68 @@
+body{
+    background-color: rgb(7, 121, 7);
+}
+
+#state_text{
+    text-align: center;
+}
+#tehai{
+    display: flex;
+    justify-content: center;
+}
+
+#yaku_lists{
+    background-color: rgb(255, 254, 249);
+    width: 80%;
+    margin: 50px auto;
+}
+.yaku_list{
+    margin-left: 50px;
+}
+.yaku_item{
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+.yaku_item::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: -webkit-calc(100% - 50px);
+    z-index: 0;
+    border-bottom: dotted 2px rgb(0, 0, 0);
+}
+.p_honsuu{
+    font-size: 30px;
+    text-align: center;
+    margin: 0;
+    padding: 10px 0;
+    
+}
+#span_honsuu_1{
+    background:linear-gradient(transparent 80%, #7a7a7a 0%);
+}
+#span_honsuu_2{
+    background:linear-gradient(transparent 80%, #58ff25 0%);
+}
+#span_honsuu_3{
+    background:linear-gradient(transparent 80%, #256aff 0%);
+}
+#span_honsuu_6{
+    background:linear-gradient(transparent 80%, #5215fa 0%);
+}
+#span_honsuu_yakuman{
+    background:linear-gradient(transparent 80%, #fa9715 0%);
+}
+.label_yaku{
+    font-size: 30px;
+    z-index: 1;
+    background-color: rgb(255,255,255);
+}
+.checkbox_yaku{
+    transform: scale(2.2);
+    margin-top: 17px;
+    margin-right: 20px;
+    height: 100%;
+    z-index: 1;
+    cursor: pointer;
+}
