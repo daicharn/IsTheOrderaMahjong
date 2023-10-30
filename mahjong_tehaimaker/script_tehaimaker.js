@@ -1,52 +1,52 @@
 //役の定義
 //1翻役
 const YAKU_1 = {
-    tanyao: {id : "tanyao", name : "断么九"},
-    pinfu: {id : "pinfu", name : "平和"},
-    ipeko: {id : "ipeko", name : "一盃口"},
-    yakuhai_ton: {id : "yakuhai_ton", name : "東"},
-    yakuhai_nan: {id : "yakuhai_nan", name : "南"},
-    yakuhai_sha: {id : "yakuhai_sha", name : "西"},
-    yakuhai_pei: {id : "yakuhai_pei", name : "北"},
-    yakuhai_haku: {id : "yakuhai_haku", name : "白"},
-    yakuhai_hatsu: {id : "yakuhai_hatsu", name : "発"},
-    yakuhai_chun: {id : "yakuhai_chun", name : "中"}
+    tanyao: {id : "tanyao", name : "断么九", weight : TEHAI_NUMBER},
+    pinfu: {id : "pinfu", name : "平和", weight : TEHAI_NUMBER},
+    ipeko: {id : "ipeko", name : "一盃口", weight : 6},
+    yakuhai_ton: {id : "yakuhai_ton", name : "東", weight : 3},
+    yakuhai_nan: {id : "yakuhai_nan", name : "南", weight : 3},
+    yakuhai_sha: {id : "yakuhai_sha", name : "西", weight : 3},
+    yakuhai_pei: {id : "yakuhai_pei", name : "北", weight : 3},
+    yakuhai_haku: {id : "yakuhai_haku", name : "白", weight : 3},
+    yakuhai_hatsu: {id : "yakuhai_hatsu", name : "発", weight : 3},
+    yakuhai_chun: {id : "yakuhai_chun", name : "中", weight : 3}
 }
 //2翻役
 const YAKU_2 = {
-    chitoi: {id : "chitoi", name : "七対子"},
-    toitoi: {id : "toitoi", name : "対々和"},
-    sananko: {id : "sananko", name : "三暗刻"},
-    doukou: {id : "doukou", name : "三色同刻"},
-    sanshoku: {id : "sanshoku", name : "三色同順"},
-    honroto: {id : "honroto", name : "混老頭"},
-    ikkituukan: {id : "ikkituukan", name : "一気通貫"},
-    chanta: {id : "chanta", name : "混全帯么九"},
-    shosangen: {id : "shosangen", name : "小三元"},
-    sankantsu: {id : "sankantsu", name : "三槓子"}
+    chitoi: {id : "chitoi", name : "七対子", weight : TEHAI_NUMBER},
+    toitoi: {id : "toitoi", name : "対々和", weight : TEHAI_NUMBER},
+    sananko: {id : "sananko", name : "三暗刻", weight : 9},
+    doukou: {id : "doukou", name : "三色同刻", weight : 9},
+    sanshoku: {id : "sanshoku", name : "三色同順", weight : 9},
+    honroto: {id : "honroto", name : "混老頭", weight : TEHAI_NUMBER},
+    ikkituukan: {id : "ikkituukan", name : "一気通貫", weight : 9},
+    chanta: {id : "chanta", name : "混全帯么九", weight : TEHAI_NUMBER},
+    shosangen: {id : "shosangen", name : "小三元", weight : 8},
+    sankantsu: {id : "sankantsu", name : "三槓子", weight : 9}
 }
 //3翻役
 const YAKU_3 = {
-    honitsu: {id : "honitsu", name : "混一色"},
-    jyunchan: {id : "jyunchan", name : "純全帯么九"},
-    ryanpeko: {id : "ryanpeko", name : "二盃口"}
+    honitsu: {id : "honitsu", name : "混一色", weight : TEHAI_NUMBER},
+    jyunchan: {id : "jyunchan", name : "純全帯么九", weight : TEHAI_NUMBER},
+    ryanpeko: {id : "ryanpeko", name : "二盃口", weight : 12}
 }
 //6翻役
 const YAKU_6 = {
-    chinitsu: {id : "chinitsu", name : "清一色"}
+    chinitsu: {id : "chinitsu", name : "清一色", weight : TEHAI_NUMBER}
 }
 //役満
 const YAKUMAN = {
-    suanko: {id : "suanko", name : "四暗刻"},
-    kokushi: {id : "kokushi", name : "国士無双"},
-    daisangen: {id : "daisangen", name : "大三元"},
-    shosushi: {id : "shosushi", name : "小四喜"},
-    daisushi: {id : "daisushi", name : "大四喜"},
-    tsuiso: {id : "tsuiso", name : "字一色"},
-    chinroto: {id : "chinroto", name : "清老頭"},
-    ryuiso: {id : "ryuiso", name : "緑一色"},
-    churen: {id : "churen", name : "九蓮宝燈"},
-    sukantsu: {id : "sukantsu", name : "四槓子"}
+    suanko: {id : "suanko", name : "四暗刻", weight : TEHAI_NUMBER},
+    kokushi: {id : "kokushi", name : "国士無双", weight : TEHAI_NUMBER},
+    daisangen: {id : "daisangen", name : "大三元", weight : 9},
+    shosushi: {id : "shosushi", name : "小四喜", weight : 11},
+    daisushi: {id : "daisushi", name : "大四喜", weight : 12},
+    tsuiso: {id : "tsuiso", name : "字一色", weight : TEHAI_NUMBER},
+    chinroto: {id : "chinroto", name : "清老頭", weight : TEHAI_NUMBER},
+    ryuiso: {id : "ryuiso", name : "緑一色", weight : TEHAI_NUMBER},
+    churen: {id : "churen", name : "九蓮宝燈", weight : TEHAI_NUMBER},
+    sukantsu: {id : "sukantsu", name : "四槓子", weight : 12}
 }
 //複合役に関する情報の定義を追加
 const FUKUGOU_KEY = "fukugou";
@@ -120,7 +120,7 @@ function getYakuInfoFromYakuID(yaku_id){
 function controlCheckBoxes(flg, yaku_id){
     //チェックボックスがONになったとき
     if(flg){
-
+        console.log(getYakuInfoFromYakuID(yaku_id));
     }
     //チェックボックスがOFFになったとき
     else{
