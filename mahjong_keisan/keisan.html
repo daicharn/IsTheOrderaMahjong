@@ -1,6 +1,7 @@
 <html>
  <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="keisan.css">
   <title>麻雀手牌計算ツール</title>
  </head>
@@ -30,11 +31,10 @@
     </div>
   </div>
   <div id="output_screen">
+    <button type="button" id="btn_backtoinput" onclick="btn_backtoinput_click()">戻る</button>
     <div id="output_header">
-    <button type="button" id="btn_backtoinput" onclick="btn_backtoinput_click()">← 手配入力へ戻る</button>
-    <div id="output_screen_p">
-      <p id="hantei_result_p">判定結果</p>
-    </div>
+     <p id="hantei_result_p">判定結果</p>
+     <div id="agari_kata_div"></div>
     </div>
     <div id="tehai_result"></div>
     <div id="tensuu_result"></div>

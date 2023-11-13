@@ -12,26 +12,38 @@ body{
 .tehai_parts{
     cursor: pointer;
 }
+.tehai_parts img{
+    width: 100%;
+}
 .tehai_value{
     display: none;
 }
 
 #tehai_naki{
+    width: 100%;
     display: flex;
     justify-content: center;
     margin: 20px 0;
 }
 .naki_pais{
+    width: 25%;
     display: flex;
-    margin: 0 20px;
+    margin: 0 1%;
     cursor: pointer;
 }
+.naki_pais_img_rotate{
+    margin-right: 4%;
+}
+
 
 #select_table{
     margin: 0 auto;
 }
 .table_pai{
     cursor: pointer;
+}
+.table_pai img{
+    width: 100%;
 }
 
 .btnlist{
@@ -57,6 +69,7 @@ body{
     background-color: rgb(0, 130, 206);
 }
 .btn_label{
+    font-size: 20px;
     display: table-cell;
     vertical-align: middle;
     text-align: center;
@@ -71,22 +84,10 @@ body{
     from {opacity: 0;}
     to {opacity: 1;}
 }
-#output_header{
-    display: table;
-    width: 63.5%;
-}
-#output_screen_p{
-    display: table-cell;
-    text-align: center;
-}
-#hantei_result_p{
-    font-size: 35px;
-    color: #e7e7e7;
-}
 #btn_backtoinput{
-    display: table-cell;
-    text-align: left;
-    width: 170px;
+    text-align: center;
+    max-width: 170px;
+    width: 20%;
     height: 50px;
     margin:20px 0 20px 20px;
     background-color: rgb(65, 65, 65);
@@ -101,10 +102,34 @@ body{
 #btn_backtoinput:hover{
     background-color: rgb(53, 53, 53);
 }
+#hantei_result_p{
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    margin: 0;
+    text-align: center;
+}
+#agari_kata_div{
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+#agari_kata_div p{
+    margin: 0;
+}
+
 #tehai_result{
     display: flex;
     justify-content: center;
+    width: 100%;
 }
+
+.naki_pais_img_rotate_res{
+    margin-right: 5%;
+}
+
 #tensuu_result{
     background-color: #e7e7e7;
     text-align: center;
@@ -113,16 +138,25 @@ body{
 #result_tables_div{
     display: flex;
     justify-content: center;
+    width: 100%;
 }
-#fusuu_table_div{
-    height: 550px;
+#yaku_table_div, #fusuu_table_div{
+    height: 400px;
+    width: 50%;
+    max-width: 550px;
     overflow-x: hidden;
     overflow-y: auto;
 }
 .result_tables{
     border-collapse: collapse;
-    width: 500px;
     font-size: 20px;
+    width: 100%;
+}
+#yaku_table{
+    margin-left: auto;
+}
+#fusuu_table{
+    margin-right: auto;
 }
 .result_tables td, th{
     background-color: #e7e7e7;
@@ -244,4 +278,30 @@ body{
     display: table;
     font-weight: bold;
     user-select: none;
+}
+
+/*レスポンシブ対応*/
+/*1100px以上の時*/
+@media screen and (min-width: 1100px){
+    .naki_pais{
+        max-width: 250px;
+    }
+}
+/*タブレット用*/
+@media screen and (max-width: 959px){
+    #state_text{
+        font-size: 28px;
+    }
+    .btn_label{
+        font-size: 16px;
+    }
+}
+/*スマホ用*/
+@media screen and (max-width: 480px){
+    #state_text{
+        font-size: 22px;
+    }
+    .btn_label{
+        font-size: 14px;
+    }
 }

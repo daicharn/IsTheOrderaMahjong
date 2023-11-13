@@ -3155,23 +3155,20 @@ function calcAgari(agari_kata){
 //アガリ牌を画面に表示させる
 function displayAgarihai(agari_kata){
     let div_element = document.createElement('div');
-    let p_element = document.createElement('p');
     let img_element = document.createElement('img');
+    let p_element = document.createElement('p');
     if(agari_kata == Agari_Kata.tsumo){
-        p_element.innerText = "ツモ";
+        p_element.innerText = "（アガリ型：ツモ）";
     }
     else{
-        p_element.innerText = "ロン";
+        p_element.innerText = "（アガリ型：ロン）";
     }
-    p_element.style.marginRight = "5px";
-    p_element.style.color = "white";
-    p_element.style.fontWeight = "bold";
-    document.getElementById('tehai_result').appendChild(p_element);
+    document.getElementById('agari_kata_div').appendChild(p_element);
 
     div_element.style.display = "flex";
     div_element.style.marginRight = "15px";
     div_element.style.backgroundColor = "red";
-    img_element.style.width = "40px";
+    img_element.style.width = "100%";
     img_element.style.opacity = "0.8";
     img_element.src = ScriptCore.generate_pai_src(agari_hai);
     div_element.appendChild(img_element);
@@ -3195,8 +3192,14 @@ function displayTehaiResult(agari_list){
         if(i < agari_list.length){
             for(let j = 0; j < agari_list[i].length; j++){
                 let img_element = document.createElement('img');
-                img_element.style.width = "40px";
                 img_element.src = ScriptCore.generate_pai_src(agari_list[i][j]);
+                //面子か雀頭か否かで画像の比率を決める
+                if(agari_list[i].length == 2){
+                    img_element.style.width = "50%";
+                }
+                else if(agari_list[i].length == 3){
+                    img_element.style.width = "33%";
+                }
                 div_element.appendChild(img_element);
             }
         }
@@ -3220,16 +3223,25 @@ function displayTehaiResult(agari_list){
             else if(naki_type == Naki_Type.minkan){
                 generateMinkanImg(div_element, pai_num, true);
             }
+
+            //鳴きのタイプが暗槓以外の場合スペースを多めに確保する
+            if(naki_type != Naki_Type.ankan){
+                div_element.style.marginLeft = "15px";
+                div_element.style.marginRight = "15px";
+            }
         }
-        //鳴き牌
         document.getElementById('tehai_result').appendChild(div_element);
     }
 }
 //手牌の結果を消去
 function deleteTehaiResult(){
     let tehai_result = document.getElementById('tehai_result');
+    let agari_kata_result = document.getElementById('agari_kata_div');
     while(tehai_result.firstChild){
         tehai_result.removeChild(tehai_result.firstChild);
+    }
+    while(agari_kata_result.firstChild){
+        agari_kata_result.removeChild(agari_kata_result.firstChild);
     }
 }
 
@@ -3523,20 +3535,25 @@ function deleteFusuuList(){
 function generatePongImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 3; i++){
         let naki_pais_img = document.createElement('img');
-        naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
+        naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num))
         if(size_min_flg){
-            naki_pais_img.style.width = "40px";
+            naki_pais_img.style.width = "33%";
+        }
+        else{
+            naki_pais_img.style.width = "23%";
         }
         if(i == 0){
-            naki_pais_img.style.transform = "rotate(-90deg)";
             if(size_min_flg){
-                naki_pais_img.style.marginLeft = "7px";
-                naki_pais_img.style.marginRight = "7px";
+                naki_pais_img.className = "naki_pais_img_rotate_res";
             }
             else{
-                naki_pais_img.style.marginLeft = "10px";
-                naki_pais_img.style.marginRight = "10px";
+                naki_pais_img.className = "naki_pais_img_rotate";
             }
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            naki_pais_img.style.marginLeft = "auto";
+        }
+        else if(i == 2){
+            naki_pais_img.style.marginRight = "auto";
         }
         naki_pais_div.appendChild(naki_pais_img);
     }
@@ -3548,18 +3565,23 @@ function generateChiImg(naki_pais_div, pai_num, size_min_flg){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num + i));
         if(size_min_flg){
-            naki_pais_img.style.width = "40px";
+            naki_pais_img.style.width = "33%";
+        }
+        else{
+            naki_pais_img.style.width = "23%";
         }
         if(i == 0){
-            naki_pais_img.style.transform = "rotate(-90deg)";
             if(size_min_flg){
-                naki_pais_img.style.marginLeft = "7px";
-                naki_pais_img.style.marginRight = "7px";
+                naki_pais_img.className = "naki_pais_img_rotate_res";
             }
             else{
-                naki_pais_img.style.marginLeft = "10px";
-                naki_pais_img.style.marginRight = "10px";
+                naki_pais_img.className = "naki_pais_img_rotate";
             }
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            naki_pais_img.style.marginLeft = "auto";
+        }
+        else if(i == 2){
+            naki_pais_img.style.marginRight = "auto";
         }
         naki_pais_div.appendChild(naki_pais_img);
     }
@@ -3569,11 +3591,11 @@ function generateChiImg(naki_pais_div, pai_num, size_min_flg){
 function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 4; i++){
         let naki_pais_img = document.createElement('img');
-        if(size_min_flg){
-            naki_pais_img.style.width = "40px";
-        }
+        naki_pais_img.style.width = "23%";
         if(i == 0 || i == 3){
             naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(BACK));
+            if(i == 0) naki_pais_img.style.marginLeft = "auto";
+            else naki_pais_img.style.marginRight = "auto";
         }
         else{
             naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
@@ -3587,19 +3609,19 @@ function generateMinkanImg(naki_pais_div, pai_num, size_min_flg){
     for(let i = 0; i < 4; i++){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
-        if(size_min_flg){
-            naki_pais_img.style.width = "40px";
-        }
+        naki_pais_img.style.width = "23%";
         if(i == 0){
-            naki_pais_img.style.transform = "rotate(-90deg)";
             if(size_min_flg){
-                naki_pais_img.style.marginLeft = "7px";
-                naki_pais_img.style.marginRight = "7px";
+                naki_pais_img.className = "naki_pais_img_rotate_res";
             }
             else{
-                naki_pais_img.style.marginLeft = "10px";
-                naki_pais_img.style.marginRight = "10px";
+                naki_pais_img.className = "naki_pais_img_rotate";
             }
+            naki_pais_img.style.transform = "rotate(-90deg)";
+            naki_pais_img.style.marginLeft = "auto";
+        }
+        else if(i == 3){
+            naki_pais_img.style.marginRight = "auto";
         }
         naki_pais_div.appendChild(naki_pais_img);
     }
