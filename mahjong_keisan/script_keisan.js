@@ -3217,7 +3217,7 @@ function displayTehaiResult(agari_list){
             }
             //暗槓の時
             else if(naki_type == Naki_Type.ankan){
-                generateAnkanImg(div_element, pai_num, true);
+                generateAnkanImg(div_element, pai_num);
             }
             //明槓の時
             else if(naki_type == Naki_Type.minkan){
@@ -3504,12 +3504,23 @@ function displayFusuuList(fusuu, fusuu_ceil, fusuu_summary_list){
         else if(fusuu_summary == Fusuu_Pattern.chuchan_minkan || fusuu_summary == Fusuu_Pattern.yaochu_minkan){
             cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
             generateMinkanImg(cell_summary_img, fusuu_summary_list[i][2], true);
+            //画像のサイズを40px固定にする処理
+            for(let i = 0; i < cell_summary_img.children.length; i++){
+                cell_summary_img.children[i].style.width = "40px";
+                if(i == 0){
+                    cell_summary_img.children[i].style.marginRight = "2%";
+                }
+            }
             cell_summary.appendChild(cell_summary_img);
         }
         //暗槓
         else if(fusuu_summary == Fusuu_Pattern.chuchan_ankan || fusuu_summary == Fusuu_Pattern.yaochu_ankan){
             cell_summary.innerText = getFusuuSummaryStr(fusuu_summary);
-            generateAnkanImg(cell_summary_img, fusuu_summary_list[i][2], true);
+            generateAnkanImg(cell_summary_img, fusuu_summary_list[i][2]);
+            //画像のサイズを40px固定にする処理
+            for(let i = 0; i < cell_summary_img.children.length; i++){
+                cell_summary_img.children[i].style.width = "40px";
+            }
             cell_summary.appendChild(cell_summary_img);
         }
         //その他の場合は詳細のみをそのまま表示（画像は無し）
@@ -3532,22 +3543,22 @@ function deleteFusuuList(){
 }
 
 //ポンの時のimg要素を生成
-function generatePongImg(naki_pais_div, pai_num, size_min_flg){
+function generatePongImg(naki_pais_div, pai_num, size_res_flg){
     for(let i = 0; i < 3; i++){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num))
-        if(size_min_flg){
+        if(size_res_flg){
             naki_pais_img.style.width = "33%";
         }
         else{
             naki_pais_img.style.width = "23%";
         }
         if(i == 0){
-            if(size_min_flg){
-                naki_pais_img.className = "naki_pais_img_rotate_res";
+            if(size_res_flg){
+                naki_pais_img.style.marginRight = "5%";
             }
             else{
-                naki_pais_img.className = "naki_pais_img_rotate";
+                naki_pais_img.style.marginRight = "4%";
             }
             naki_pais_img.style.transform = "rotate(-90deg)";
             naki_pais_img.style.marginLeft = "auto";
@@ -3560,22 +3571,22 @@ function generatePongImg(naki_pais_div, pai_num, size_min_flg){
 }
 
 //チーの時のimg要素を生成
-function generateChiImg(naki_pais_div, pai_num, size_min_flg){
+function generateChiImg(naki_pais_div, pai_num, size_res_flg){
     for(let i = 0; i < 3; i++){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num + i));
-        if(size_min_flg){
+        if(size_res_flg){
             naki_pais_img.style.width = "33%";
         }
         else{
             naki_pais_img.style.width = "23%";
         }
         if(i == 0){
-            if(size_min_flg){
-                naki_pais_img.className = "naki_pais_img_rotate_res";
+            if(size_res_flg){
+                naki_pais_img.style.marginRight = "5%";
             }
             else{
-                naki_pais_img.className = "naki_pais_img_rotate";
+                naki_pais_img.style.marginRight = "4%";
             }
             naki_pais_img.style.transform = "rotate(-90deg)";
             naki_pais_img.style.marginLeft = "auto";
@@ -3588,7 +3599,7 @@ function generateChiImg(naki_pais_div, pai_num, size_min_flg){
 }
 
 //暗槓の時のimg要素を生成
-function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
+function generateAnkanImg(naki_pais_div, pai_num){
     for(let i = 0; i < 4; i++){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.style.width = "23%";
@@ -3605,17 +3616,17 @@ function generateAnkanImg(naki_pais_div, pai_num, size_min_flg){
 }
 
 //明槓の時のimg要素を生成
-function generateMinkanImg(naki_pais_div, pai_num, size_min_flg){
+function generateMinkanImg(naki_pais_div, pai_num, size_res_flg){
     for(let i = 0; i < 4; i++){
         let naki_pais_img = document.createElement('img');
         naki_pais_img.setAttribute('src', ScriptCore.generate_pai_src(pai_num));
         naki_pais_img.style.width = "23%";
         if(i == 0){
-            if(size_min_flg){
-                naki_pais_img.className = "naki_pais_img_rotate_res";
+            if(size_res_flg){
+                naki_pais_img.style.marginRight = "5%";
             }
             else{
-                naki_pais_img.className = "naki_pais_img_rotate";
+                naki_pais_img.style.marginRight = "4%";
             }
             naki_pais_img.style.transform = "rotate(-90deg)";
             naki_pais_img.style.marginLeft = "auto";
@@ -3766,7 +3777,7 @@ for(let i = 0; i < table_pais.length; i++){
             hidden_tehai_three();
 
             //画像を生成
-            generateAnkanImg(naki_pais_div, pai_num, false);
+            generateAnkanImg(naki_pais_div, pai_num);
 
             //鳴いた牌の種類と鳴きのタイプ（暗槓）をリストに挿入
             naki_pais_list.push(pai_num);

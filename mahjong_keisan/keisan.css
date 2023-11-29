@@ -31,10 +31,6 @@ body{
     margin: 0 1%;
     cursor: pointer;
 }
-.naki_pais_img_rotate{
-    margin-right: 4%;
-}
-
 
 #select_table{
     margin: 0 auto;
@@ -124,10 +120,6 @@ body{
     display: flex;
     justify-content: center;
     width: 100%;
-}
-
-.naki_pais_img_rotate_res{
-    margin-right: 5%;
 }
 
 #tensuu_result{
