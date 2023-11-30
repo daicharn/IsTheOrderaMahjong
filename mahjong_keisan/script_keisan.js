@@ -1569,7 +1569,7 @@ function isMenzenTsumo(agari_kata){
 }
 
 //断么九（タンヤオ）の判定
-function isTanyao(agari_list){
+function isTanyao(agari_list, naki_type_list_arg, naki_pais_list_arg){
     let kuitan_flg = false;
     //喰いタンの場合面前役
     if(!kuitan_flg || isMenzen()){
@@ -1593,10 +1593,10 @@ function isTanyao(agari_list){
         }
 
         //鳴き牌を見る
-        for(let i = 0; i < naki_type_list.length; i++){
-            let haishu = naki_pais_list[i];
+        for(let i = 0; i < naki_type_list_arg.length; i++){
+            let haishu = naki_pais_list_arg[i];
             //チー以外の場合
-            if(!(naki_type_list[i] == Naki_Type.chi)){
+            if(!(naki_type_list_arg[i] == Naki_Type.chi)){
                 //先頭の牌が数牌の1または9でなければ不成立
                 if(isYaochuhai(haishu)){
                     return false;
@@ -2681,7 +2681,7 @@ function calcAgari(agari_kata){
                             mentsumo_flg = true;
                         }
                         //断么九
-                        if(isTanyao(agari_lists[i])){
+                        if(isTanyao(agari_lists[i], naki_type_list, naki_pais_list)){
                             honsuu += 1;
                             yaku_list.push(["1翻","断么九"]);
                         }
@@ -2784,7 +2784,7 @@ function calcAgari(agari_kata){
                         mentsumo_flg = true;
                     }
                     //断么九
-                    if(isTanyao(agari_lists[i])){
+                    if(isTanyao(agari_lists[i], naki_type_list, naki_pais_list)){
                         honsuu += 1;
                         yaku_list.push(["1翻","断么九"]);
                     }
