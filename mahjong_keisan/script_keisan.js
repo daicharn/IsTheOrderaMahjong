@@ -1597,14 +1597,14 @@ function isTanyao(agari_list, naki_type_list_arg, naki_pais_list_arg){
             let haishu = naki_pais_list_arg[i];
             //チー以外の場合
             if(!(naki_type_list_arg[i] == Naki_Type.chi)){
-                //先頭の牌が数牌の1または9でなければ不成立
+                //先頭の牌が数牌の1または9であれば不成立
                 if(isYaochuhai(haishu)){
                     return false;
                 }
             }
             //チーの場合
             else{
-                //先頭の牌が数牌の1または7でなければ不成立
+                //先頭の牌が数牌の1または7であれば不成立
                 if(((haishu - 1) % 9 == 0 || (haishu - 1) % 9 == 6) || (haishu >= JIHAI[0] && haishu <= JIHAI[6])){
                     return false;
                 }
