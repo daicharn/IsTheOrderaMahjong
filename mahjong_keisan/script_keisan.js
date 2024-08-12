@@ -2674,10 +2674,10 @@ function calcAgari(agari_kata){
                             honsuu += 1;
                             yaku_list.push(["1翻","河底撈魚"]);
                         }
-                        //面前清自模
+                        //門前清自模和
                         if(isMenzenTsumo(agari_kata)){
                             honsuu += 1;
-                            yaku_list.push(["1翻","面前清自模和"]);
+                            yaku_list.push(["1翻","門前清自模和"]);
                             mentsumo_flg = true;
                         }
                         //断么九
@@ -2777,10 +2777,10 @@ function calcAgari(agari_kata){
                         honsuu += 1;
                         yaku_list.push(["1翻","河底撈魚"]);
                     }
-                    //面前清自模
+                    //門前清自模和
                     if(isMenzenTsumo(agari_kata)){
                         honsuu += 1;
-                        yaku_list.push(["1翻","面前清自模和"]);
+                        yaku_list.push(["1翻","門前清自模和"]);
                         mentsumo_flg = true;
                     }
                     //断么九
