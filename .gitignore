@@ -1,2 +1,7 @@
 practice_script/
 mahjong_game_prot/
+babel.config.js
+jest.config.js
+package.json
+tsconfig.json
+.vscode

@@ -3,6 +3,7 @@ import { Hais } from './Hais';
 import {PlayerHand} from './PlayerHand';
 import {PlayerContext} from './PlayerContext';
 import {BlockHais} from './BlockHais';
+import {BlockHaisList} from './BlockHaisList';
 
 export class YakuChecker {
     hand: PlayerHand;
@@ -18,7 +19,7 @@ export class YakuChecker {
         if(idx !== -1) arr.splice(idx, 1);
     }
 
-    private countBlocks(blocks: BlockHais[], janto_arg: number, mentsu_arg: number): boolean{
+    private countBlocks(blocks: BlockHaisList, janto_arg: number, mentsu_arg: number): boolean{
         let janto = 0;
         let mentsu = 0;
 
@@ -33,9 +34,9 @@ export class YakuChecker {
         return false;
     }
 
-    private dedupeBlockHais(blockhais: BlockHais[][]): BlockHais[][]{
+    private dedupeBlockHais(BlockHaisList: BlockHaisList[]): BlockHaisList[]{
         const order = {"JANTO": 0, "KOTSU": 1, "SHUNTSU": 2};
-        const normalize = (blocks: BlockHais[]): string =>{
+        const normalize = (blocks: BlockHaisList): string =>{
             const sorted = [...blocks].sort((a, b) => {
                 const t = order[a.type] - order[b.type];
                 if(t !== 0) return t;
@@ -49,8 +50,8 @@ export class YakuChecker {
             return sorted.map(b => `${b.type}:${b.ids.map(h => h.id).join(",")}`).join("|");
         }
         
-        const unique = new Map<string, BlockHais[]>();
-        for(const blocks of blockhais){
+        const unique = new Map<string, BlockHaisList>();
+        for(const blocks of BlockHaisList){
             const key = normalize(blocks);
             if(!unique.has(key)){
                 unique.set(key, blocks);
@@ -60,18 +61,18 @@ export class YakuChecker {
         return [...unique.values()];
     }
 
-    testToBlocks(): BlockHais[][]{
+    testToBlocks(): BlockHaisList[]{
         return this.toBlocks([...this.hand.tehai.hais]);
     } 
 
-    toBlocks(hais: Hai[]): BlockHais[][]{
-        const results: BlockHais[][] = [];
+    toBlocks(hais: Hai[]): BlockHaisList[]{
+        const results: BlockHaisList[] = [];
         const arr_hai: Hai[] = [...hais].sort((a, b) => a.id - b.id);
-        const blockhais: BlockHais[] = [];
+        const blockhaislist: BlockHaisList = new BlockHaisList();
 
-        const dfs = (arr: Hai[], blocks: BlockHais[]) => {
-            if(arr.length === 0 && this.countBlocks(blocks, 1, 4)){
-                results.push([...blocks]);
+        const dfs = (arr: Hai[], blocks: BlockHaisList) => {
+            if(arr.length === 0 && blocks.isStandardHand()){
+                results.push(new BlockHaisList([...blocks]));
                 return;
             }
 
@@ -122,9 +123,9 @@ export class YakuChecker {
                 this.removeHai(next, first);
                 this.removeHai(next, first);
 
-                blockhais.push(new BlockHais("JANTO", [first, first]));
-                dfs(next, blockhais);
-                blockhais.pop();
+                blockhaislist.push(new BlockHais("JANTO", [first, first]));
+                dfs(next, blockhaislist);
+                blockhaislist.pop();
             }
         }
 
