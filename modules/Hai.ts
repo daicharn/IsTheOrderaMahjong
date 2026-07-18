@@ -40,4 +40,8 @@ export class Hai{
     isNumberTile(): boolean {
         return this.type == "MANZU" || this.type === "PINZU" || this.type === "SOUZU";
     }
+
+    clone(): Hai {
+        return new Hai(this.id);
+    }
 }

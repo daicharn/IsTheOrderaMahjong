@@ -8,4 +8,8 @@ export class BlockHais {
         this.type = type;
         this.ids = ids;
     }
+
+    clone(): BlockHais {
+        return new BlockHais(this.type, this.ids.map(h => h.clone()));
+    }
 }
